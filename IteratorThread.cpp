@@ -5,6 +5,7 @@
 
 #include "IteratorThread.h"
 #include "NTFS_FileSystemClass.h"
+#include "Main.h"
 
 
 #pragma package(smart_init)
@@ -29,8 +30,9 @@ __fastcall IteratorThread::IteratorThread(WCHAR *filePath, bool CreateSuspended)
 	FreeOnTerminate = true;
 	// Открыть файловую систему
 	NTFS_FileSystemClass *NTFS_FileSystem = new NTFS_FileSystemClass();
-	WCHAR *FileSystemPath =  L"\\\\.\\S:" ;
-	bool isOpen = NTFS_FileSystem->Open(FileSystemPath);
+	WCHAR *FileSystemPath =  L"\\\\.\\E:" ;
+	bool isOpen = NTFS_FileSystem->open(FileSystemPath);
+    bool isSetBootInfo = NTFS_FileSystem->setBootInfo();
 
 
 }

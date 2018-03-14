@@ -12,22 +12,22 @@ typedef struct
 {
         //в комментариях к полям указано смещение в 10 и 16 формате
     BYTE djmp[3];   //0
-    BYTE dSystemID[8];   //3
+	char OEM_ID[8];   //3
 	WORD dBytesPerSector;  //11  b
 	BYTE dSectorPerCluster;  //13  d
-    BYTE dUnusedA[7];  //14  e
-    BYTE dMediaID;  //21  15
-    WORD dUnusedB;  //22 16
-    WORD dSectorPerTrack; //24 18
-    WORD dHeadsCount; // 26 1a
-    BYTE dUnusedC[8];  // 28 1c
-    BYTE dUsualy[4];   //36 24
-    INT64 dNumberOfSectors;  //40 28
-    INT64 dLCNofMFT;  //48 30
-    INT64 dLCNofMFTMirr;  //56 38
-    DWORD ClusterPerMFT;  //64 40
-    DWORD ClustersPerIndexes;  //68 44
-    BYTE dSerialNumber[8];  //72 48
+	BYTE dUnusedA[7];  //14  e
+	BYTE dMediaID;  //21  15
+	WORD dUnusedB;  //22 16
+	WORD dSectorPerTrack; //24 18
+	WORD dHeadsCount; // 26 1a
+	BYTE dUnusedC[8];  // 28 1c
+	BYTE dUsualy[4];   //36 24
+	ULONGLONG dTotalSectors;  //40 28
+	INT64 dLCNofMFT;  //48 30
+	INT64 dLCNofMFTMirr;  //56 38
+	DWORD ClusterPerMFT;  //64 40
+	DWORD ClustersPerIndexes;  //68 44
+	ULONGLONG dSerialNumber;  //72 48
     BYTE dDataCode[432];
 } NTFS_BootRecord;
 
@@ -42,17 +42,19 @@ protected:
 	WORD BytesPerSector;
 	BYTE SectorPerCluster;
 	DWORD BytesPerCluster;
+	NTFS_BootRecord *pBootRecord;
 	// и т. д.
 
 public:
 	NTFS_FileSystemClass();
-	bool Open(WCHAR *FileSystemPath);
+	bool open(WCHAR *FileSystemPath);
+	bool setBootInfo();
 
 	DWORD GetTotalClusters() const;
-	DWORD GetBytesPerCluster() const;
+	DWORD getBytesPerCluster();
 	// ... еще какие-то функции для вывода информации о файловой системе
 
-	bool ReadClusters(ULONGLONG startCluster, DWORD numberOfClusters, BYTE *outBuffer);
+	bool readClusters(ULONGLONG startCluster, DWORD numberOfClusters, BYTE *outBuffer);
 
 	void Close();
 } ;

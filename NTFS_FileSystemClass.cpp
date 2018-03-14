@@ -19,54 +19,81 @@ NTFS_FileSystemClass::NTFS_FileSystemClass()
 
 	// ... инициализация
 }
+bool NTFS_FileSystemClass::setBootInfo()
+{
+	ULONGLONG startOffset = 0;
+	DWORD bytesToRead = 512;
+	DWORD bytesRead;
+	BYTE dataBuffer[512];
+	LARGE_INTEGER sectorOffset;
+	sectorOffset.QuadPart = startOffset;
+	unsigned long currentPosition = SetFilePointer(this->FileHandle,sectorOffset.LowPart,&sectorOffset.HighPart,FILE_BEGIN);
+	if(currentPosition != sectorOffset.LowPart)
+	{
+		return false;
+	}
+	bool readResult = ReadFile(FileHandle,dataBuffer,bytesToRead,&bytesRead,NULL);
+	if(!readResult || bytesRead != bytesToRead)
+	{
+		return false;
+	}
 
-bool NTFS_FileSystemClass::ReadClusters(ULONGLONG startCluster, DWORD numberOfClusters, BYTE *outBuffer)
+	this->pBootRecord = (NTFS_BootRecord*)dataBuffer;
+	if (strcmp(pBootRecord->OEM_ID,"NTFS    ") == 0)
+	{
+		this->BytesPerCluster=pBootRecord->dBytesPerSector*pBootRecord->dSectorPerCluster;
+		char *dtext = new char[512];
+		sprintf(dtext,"FINISHED DISK READING\n"
+							"OEM:%s\n"
+							"bytesPerSector:%d\n"
+							"sectorsPerCluster:%d\n"
+							"BytesPerCluster:%d\n"
+							"totalSectors:%d\n"
+							"volumeSerial:%d\n"
+							"headsCount:%d"
+							,pBootRecord->OEM_ID,
+							pBootRecord->dBytesPerSector,
+							pBootRecord->dSectorPerCluster,
+							this->BytesPerCluster,
+							pBootRecord->dTotalSectors,
+							pBootRecord->dSerialNumber,
+							pBootRecord->dHeadsCount
+							);
+		OutputDebugStringA(dtext);
+		return true;
+	}
+
+	return false;
+}
+
+bool NTFS_FileSystemClass::readClusters(ULONGLONG startCluster, DWORD numberOfClusters, BYTE *outBuffer)
 {
 	if(FileHandle == 0)
 	{
 		return false;
 	}
-
 	// Вычисление смещение
 	// Позиционирование
 	// Чтение
-	ULONGLONG startOffset = startCluster*BytesPerCluster;
-	DWORD bytesToRead =  numberOfClusters*BytesPerCluster;
+	ULONGLONG startOffset = startCluster*this->BytesPerCluster;
+	DWORD bytesToRead = numberOfClusters*this->BytesPerCluster;
 	DWORD bytesRead;
     LARGE_INTEGER sectorOffset;
 	sectorOffset.QuadPart = startOffset;
-		// Задать позицию
-	unsigned long currentPosition = SetFilePointer(
-				FileHandle,
-				sectorOffset.LowPart,
-				&sectorOffset.HighPart,
-				FILE_BEGIN // Точка в файле, относительно которой необходимо позиционироваться (FILE_BEGIN, FILE_CURRENT, FILE_END)
-			);
-
+	unsigned long currentPosition = SetFilePointer(this->FileHandle,sectorOffset.LowPart,&sectorOffset.HighPart,FILE_BEGIN);
 	if(currentPosition != sectorOffset.LowPart)
 	{
-		// Обработка ошибки
+		return false;
 	}
-
-	// Чтение данных
-	bool readResult = ReadFile(
-				FileHandle,
-				outBuffer,
-				bytesToRead,
-				&bytesRead,
-				NULL
-			);
-
+	bool readResult = ReadFile(FileHandle,outBuffer,bytesToRead,&bytesRead,NULL);
 	if(!readResult || bytesRead != bytesToRead)
 	{
-		// Обработка ошибки
+		return false;
 	}
-
 }
-bool NTFS_FileSystemClass::Open(WCHAR *FileSystemPath)
+bool NTFS_FileSystemClass::open(WCHAR *FileSystemPath)
 {
-	//WCHAR *FileSystemPath =  L"\\\\.\\E:";
-	HANDLE FileSystemHandle = CreateFileW(
+    this->FileHandle = CreateFileW(
 			FileSystemPath, // Имя файла (WCHAR*)
 			GENERIC_READ,	  // Режим доступа
 			FILE_SHARE_READ | FILE_SHARE_WRITE, // Режим совместной работы
@@ -75,7 +102,7 @@ bool NTFS_FileSystemClass::Open(WCHAR *FileSystemPath)
 			FILE_ATTRIBUTE_NORMAL, // Флаги и атрибуты
 			NULL // Описатель (идентификатор) файла шаблона с правами доступа GENERIC_READ.
 		);
-	if(FileSystemHandle == INVALID_HANDLE_VALUE)
+	if(this->FileHandle == INVALID_HANDLE_VALUE)
 	{
 		// Обработка ошибки
 		Application->MessageBoxW(L"Не удаётся открыть раздел", L"Ошибка", MB_OK);
@@ -83,24 +110,9 @@ bool NTFS_FileSystemClass::Open(WCHAR *FileSystemPath)
 
 	}
 
-	NTFS_BootRecord *pBootRecord;
-	// Объявляем буфер для хранения загрузочной записи
-	BYTE buffer[1024];
-	// Считываем данные в буфер
-	ReadClusters(0,1,buffer);
-	// Инициализируем указатель
-	pBootRecord = (NTFS_BootRecord*)buffer;
-
-
-	// Работаем с данными
-	//int bytesPerSector = (0x01 << pBootRecord->SectorFactor);
-	//int sectorsPerCluster = (0x01 << pBootRecord->ClusterFactor);
-	//int bytesPerCluster = bytesPerSector*sectorsPerCluster;
-	// и т. д.
-
-	int bytesPerSector = (0x01 << pBootRecord->dBytesPerSector);
-	int sectorsPerCluster = (0x01 << pBootRecord->dSectorPerCluster);
-	BytesPerCluster = bytesPerSector*sectorsPerCluster;;
-
+}
+DWORD NTFS_FileSystemClass::getBytesPerCluster()
+{
+	return  BytesPerCluster;
 }
 

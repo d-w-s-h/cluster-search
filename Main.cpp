@@ -20,3 +20,4 @@ void __fastcall TMainForm::SearchButtonClick(TObject *Sender)
 	IteratorThread *myIteratorThread = new IteratorThread(PathEdit->Text.c_str(), false);
 }
 //---------------------------------------------------------------------------
+
