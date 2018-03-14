@@ -11,6 +11,12 @@
 NTFS_FileSystemClass::NTFS_FileSystemClass()
 {
 	FileHandle = 0;
+	TotalClusters=0;
+	ClusterFactor=1;
+	BytesPerSector= 4;
+	SectorPerCluster= 128;
+	BytesPerCluster=512;
+
 	// ... инициализация
 }
 
@@ -24,6 +30,38 @@ bool NTFS_FileSystemClass::ReadClusters(ULONGLONG startCluster, DWORD numberOfCl
 	// Вычисление смещение
 	// Позиционирование
 	// Чтение
+	ULONGLONG startOffset = startCluster*BytesPerCluster;
+	DWORD bytesToRead =  numberOfClusters*BytesPerCluster;
+	DWORD bytesRead;
+    LARGE_INTEGER sectorOffset;
+	sectorOffset.QuadPart = startOffset;
+		// Задать позицию
+	unsigned long currentPosition = SetFilePointer(
+				FileHandle,
+				sectorOffset.LowPart,
+				&sectorOffset.HighPart,
+				FILE_BEGIN // Точка в файле, относительно которой необходимо позиционироваться (FILE_BEGIN, FILE_CURRENT, FILE_END)
+			);
+
+	if(currentPosition != sectorOffset.LowPart)
+	{
+		// Обработка ошибки
+	}
+
+	// Чтение данных
+	bool readResult = ReadFile(
+				FileHandle,
+				outBuffer,
+				bytesToRead,
+				&bytesRead,
+				NULL
+			);
+
+	if(!readResult || bytesRead != bytesToRead)
+	{
+		// Обработка ошибки
+	}
+
 }
 bool NTFS_FileSystemClass::Open(WCHAR *FileSystemPath)
 {
@@ -48,10 +86,11 @@ bool NTFS_FileSystemClass::Open(WCHAR *FileSystemPath)
 	NTFS_BootRecord *pBootRecord;
 	// Объявляем буфер для хранения загрузочной записи
 	BYTE buffer[1024];
-    // Считываем данные в буфер
-
+	// Считываем данные в буфер
+	ReadClusters(0,1,buffer);
 	// Инициализируем указатель
-	//pBootRecord = (ExFAT_BootRecord*)buffer;
+	pBootRecord = (NTFS_BootRecord*)buffer;
+
 
 	// Работаем с данными
 	//int bytesPerSector = (0x01 << pBootRecord->SectorFactor);
@@ -59,4 +98,9 @@ bool NTFS_FileSystemClass::Open(WCHAR *FileSystemPath)
 	//int bytesPerCluster = bytesPerSector*sectorsPerCluster;
 	// и т. д.
 
+	int bytesPerSector = (0x01 << pBootRecord->dBytesPerSector);
+	int sectorsPerCluster = (0x01 << pBootRecord->dSectorPerCluster);
+	BytesPerCluster = bytesPerSector*sectorsPerCluster;;
+
 }
+

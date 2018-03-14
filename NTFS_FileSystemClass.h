@@ -13,8 +13,8 @@ typedef struct
         //в комментари€х к пол€м указано смещение в 10 и 16 формате
     BYTE djmp[3];   //0
     BYTE dSystemID[8];   //3
-    WORD dBytesPerSector;  //11  b
-    BYTE dSectorPerCluster;  //13  d
+	WORD dBytesPerSector;  //11  b
+	BYTE dSectorPerCluster;  //13  d
     BYTE dUnusedA[7];  //14  e
     BYTE dMediaID;  //21  15
     WORD dUnusedB;  //22 16
@@ -39,12 +39,14 @@ protected:
 	HANDLE FileHandle;
 	DWORD TotalClusters;
 	BYTE ClusterFactor;
+	WORD BytesPerSector;
+	BYTE SectorPerCluster;
 	DWORD BytesPerCluster;
 	// и т. д.
 
 public:
 	NTFS_FileSystemClass();
-	bool Open(WCHAR *fileName);
+	bool Open(WCHAR *FileSystemPath);
 
 	DWORD GetTotalClusters() const;
 	DWORD GetBytesPerCluster() const;
