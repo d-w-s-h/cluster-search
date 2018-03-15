@@ -13,6 +13,7 @@ TMainForm *MainForm;
 __fastcall TMainForm::TMainForm(TComponent* Owner)
 	: TForm(Owner)
 {
+    ResultTree->NodeDataSize = sizeof(DBstruct);
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::SearchButtonClick(TObject *Sender)

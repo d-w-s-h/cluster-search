@@ -57,12 +57,12 @@ void __fastcall IteratorThread::Execute()
 	for(int i = 1; i < this->NTFS_FileSystem->getTotalClusters(); i++)
 	{
 		// Заблокировать доступ к буферу
-		BufferAccessCS->Enter();
+		//BufferAccessCS->Enter();
 
 		// Считать данные в локальный буфер
 		this->NTFS_FileSystem->readClusters(i,1,dataBuffer);
 		// Разблокировать доступ к буферу
-		BufferAccessCS->Leave();
+		//BufferAccessCS->Leave();
 
 		// Выставить флаг готовности буфера
 		MySearchThread->BufferReadyEvent->SetEvent();

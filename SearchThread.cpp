@@ -100,6 +100,8 @@ void __fastcall SearchThread::AddMatch()
 	wcscpy(nodeData->type, L"JFIF//Exif");
 	NodeId++;
 
+
+
 }
 //---------------------------------------------------------------------------
 void __fastcall SearchThread::CompleteSearch()
