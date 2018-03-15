@@ -20,7 +20,7 @@ __fastcall TMainForm::TMainForm(TComponent* Owner)
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::SearchButtonClick(TObject *Sender)
 {
-	//ResultTree-> Clear();
+	ResultTree-> Clear();
 	myIteratorThread = new IteratorThread(PathEdit->Text.c_str(), false);
 }
 //---------------------------------------------------------------------------

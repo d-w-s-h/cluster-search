@@ -14,8 +14,6 @@ NTFS_FileSystemClass::NTFS_FileSystemClass()
 	TotalClusters=0;
 	ClusterFactor=1;
 	BytesPerCluster=512;
-
-	// ... инициализация
 }
 bool NTFS_FileSystemClass::setBootInfo()
 {
@@ -41,8 +39,9 @@ bool NTFS_FileSystemClass::setBootInfo()
 	{
 		this->BytesPerCluster=pBootRecord->dBytesPerSector*pBootRecord->dSectorPerCluster;
 		this->TotalClusters=pBootRecord->dTotalSectors/ pBootRecord->dSectorPerCluster;
-		DebugInfo = new char[512];
-		sprintf(DebugInfo,"SET BOOT INFO\n"
+
+		this->DebugInfo = new char[512];
+		sprintf(this->DebugInfo,"SET BOOT INFO\n"
 							"OEM:%s\n"
 							"bytesPerSector:%d\n"
 							"sectorsPerCluster:%d\n"
@@ -63,7 +62,7 @@ bool NTFS_FileSystemClass::setBootInfo()
 							pBootRecord->dHeadsCount,
 							pBootRecord->dLCNofMFT
 							);
-		OutputDebugStringA(DebugInfo);
+		OutputDebugStringA(this->DebugInfo);
 		return true;
 	}
 
@@ -127,6 +126,6 @@ DWORD NTFS_FileSystemClass::getTotalClusters()
 void NTFS_FileSystemClass::close()
 {
 	CloseHandle(this->FileHandle);
-	//delete DebugInfo;
+	delete[] this->DebugInfo;
 }
 
