@@ -41,18 +41,15 @@ protected:
 	BYTE ClusterFactor;
 	DWORD BytesPerCluster;
 	NTFS_BootRecord *pBootRecord;
-	// и т. д.
+	char *DebugInfo;
+
 
 public:
 	NTFS_FileSystemClass();
 	bool open(WCHAR *FileSystemPath);
 	bool setBootInfo();
-
 	DWORD getTotalClusters();
 	DWORD getBytesPerCluster();
-	// ... еще какие-то функции для вывода информации о файловой системе
-
 	bool readClusters(ULONGLONG startCluster, DWORD numberOfClusters, BYTE *outBuffer);
-
-	void Close();
+	void close();
 } ;

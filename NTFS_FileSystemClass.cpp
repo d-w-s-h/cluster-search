@@ -41,8 +41,8 @@ bool NTFS_FileSystemClass::setBootInfo()
 	{
 		this->BytesPerCluster=pBootRecord->dBytesPerSector*pBootRecord->dSectorPerCluster;
 		this->TotalClusters=pBootRecord->dTotalSectors/ pBootRecord->dSectorPerCluster;
-		char *dtext = new char[512];
-		sprintf(dtext,"SET BOOT INFO\n"
+		DebugInfo = new char[512];
+		sprintf(DebugInfo,"SET BOOT INFO\n"
 							"OEM:%s\n"
 							"bytesPerSector:%d\n"
 							"sectorsPerCluster:%d\n"
@@ -63,7 +63,7 @@ bool NTFS_FileSystemClass::setBootInfo()
 							pBootRecord->dHeadsCount,
 							pBootRecord->dLCNofMFT
 							);
-		OutputDebugStringA(dtext);
+		OutputDebugStringA(DebugInfo);
 		return true;
 	}
 
@@ -122,5 +122,11 @@ DWORD NTFS_FileSystemClass::getBytesPerCluster()
 DWORD NTFS_FileSystemClass::getTotalClusters()
 {
 	return  TotalClusters;
+}
+
+void NTFS_FileSystemClass::close()
+{
+	CloseHandle(this->FileHandle);
+	//delete DebugInfo;
 }
 

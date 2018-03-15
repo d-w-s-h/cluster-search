@@ -9,16 +9,19 @@
 #pragma link "VirtualTrees"
 #pragma resource "*.dfm"
 TMainForm *MainForm;
+IteratorThread *myIteratorThread;
+
 //---------------------------------------------------------------------------
 __fastcall TMainForm::TMainForm(TComponent* Owner)
 	: TForm(Owner)
 {
-    ResultTree->NodeDataSize = sizeof(DBstruct);
+	ResultTree->NodeDataSize = sizeof(DBstruct);
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::SearchButtonClick(TObject *Sender)
 {
-	IteratorThread *myIteratorThread = new IteratorThread(PathEdit->Text.c_str(), false);
+	//ResultTree-> Clear();
+	myIteratorThread = new IteratorThread(PathEdit->Text.c_str(), false);
 }
 //---------------------------------------------------------------------------
 
@@ -36,4 +39,18 @@ void __fastcall TMainForm::ResultTreeGetText(TBaseVirtualTree *Sender, PVirtualN
 }
 //---------------------------------------------------------------------------
 
+
+
+
+void __fastcall TMainForm::FormClose(TObject *Sender, TCloseAction &Action)
+{
+	myIteratorThread->Terminate();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMainForm::StopButtonClick(TObject *Sender)
+{
+   myIteratorThread->Terminate();
+}
+//---------------------------------------------------------------------------
 

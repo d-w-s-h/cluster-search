@@ -14,6 +14,7 @@ private:
 	NTFS_FileSystemClass *NTFS_FileSystem;
 	HANDLE FileSystemHandle;
 	SearchThread *MySearchThread;
+	BYTE *dataBuffer;
 
 protected:
 	void __fastcall Execute();

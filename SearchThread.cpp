@@ -99,9 +99,6 @@ void __fastcall SearchThread::AddMatch()
 	nodeData->cluster = CurrentCluster;
 	wcscpy(nodeData->type, L"JFIF//Exif");
 	NodeId++;
-
-
-
 }
 //---------------------------------------------------------------------------
 void __fastcall SearchThread::CompleteSearch()

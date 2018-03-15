@@ -50,7 +50,7 @@ void __fastcall IteratorThread::Execute()
 {
 	// Определить размер кластера
 	int clusterSize = this->NTFS_FileSystem->getBytesPerCluster();
-	BYTE *dataBuffer = new BYTE[clusterSize];
+	dataBuffer = new BYTE[clusterSize];
 	MySearchThread = new SearchThread(dataBuffer,clusterSize,false);
 
 	// Перебор кластеров диска
@@ -67,19 +67,21 @@ void __fastcall IteratorThread::Execute()
 		// Выставить флаг готовности буфера
 		MySearchThread->BufferReadyEvent->SetEvent();
 
-
-
 		// Ожидать окончания копирования буфера
 		while(MySearchThread->BufferCopiedEvent->WaitFor(WaitDelayMs) != wrSignaled)
 		{
 		}
-
-		MySearchThread->BufferCopiedEvent->ResetEvent();
+        MySearchThread->BufferCopiedEvent->ResetEvent();
+       	if(Terminated) break;
 	}
+
 
 	// Завершить поиск
 	MySearchThread->Terminate();
-
 	delete[] dataBuffer;
+	NTFS_FileSystem->close();
+	delete NTFS_FileSystem;
+
+
 }
 //---------------------------------------------------------------------------
