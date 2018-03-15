@@ -76,11 +76,15 @@ void SearchThread::CopyData()
 void SearchThread::SearchData()
 {
 	// Провести поиск
-	Sleep(50);
-	// memcmp
-	bool matchFound = true;
 
-	if(matchFound)
+	// memcmp
+	char *Signature1 = "JFIF";
+	char *Signature2 = "Exif";
+
+	bool matchFound1 = memcmp(OutBufferPtr+6 , Signature1, 4);
+	bool matchFound2 = memcmp(OutBufferPtr+6 , Signature2, 4);
+
+	if(!matchFound1 ||!matchFound2 )
 	{
 		Synchronize(&AddMatch);
 	}

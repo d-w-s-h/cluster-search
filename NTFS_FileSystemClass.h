@@ -39,8 +39,6 @@ protected:
 	HANDLE FileHandle;
 	DWORD TotalClusters;
 	BYTE ClusterFactor;
-	WORD BytesPerSector;
-	BYTE SectorPerCluster;
 	DWORD BytesPerCluster;
 	NTFS_BootRecord *pBootRecord;
 	// и т. д.
@@ -50,7 +48,7 @@ public:
 	bool open(WCHAR *FileSystemPath);
 	bool setBootInfo();
 
-	DWORD GetTotalClusters() const;
+	DWORD getTotalClusters();
 	DWORD getBytesPerCluster();
 	// ... еще какие-то функции для вывода информации о файловой системе
 

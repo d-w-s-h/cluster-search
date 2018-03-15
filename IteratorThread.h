@@ -6,10 +6,12 @@
 #include <System.Classes.hpp>
 //---------------------------------------------------------------------------
 #include "SearchThread.h"
+#include "NTFS_FileSystemClass.h"
 //---------------------------------------------------------------------------
 class IteratorThread : public TThread
 {
 private:
+	NTFS_FileSystemClass *NTFS_FileSystem;
 	HANDLE FileSystemHandle;
 	SearchThread *MySearchThread;
 

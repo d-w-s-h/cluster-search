@@ -4,7 +4,6 @@
 #pragma hdrstop
 
 #include "IteratorThread.h"
-#include "NTFS_FileSystemClass.h"
 #include "Main.h"
 
 
@@ -29,10 +28,19 @@ __fastcall IteratorThread::IteratorThread(WCHAR *filePath, bool CreateSuspended)
 {
 	FreeOnTerminate = true;
 	// Открыть файловую систему
-	NTFS_FileSystemClass *NTFS_FileSystem = new NTFS_FileSystemClass();
+	this->NTFS_FileSystem = new NTFS_FileSystemClass();
 	WCHAR *FileSystemPath =  L"\\\\.\\E:" ;
 	bool isOpen = NTFS_FileSystem->open(FileSystemPath);
-    bool isSetBootInfo = NTFS_FileSystem->setBootInfo();
+	if(!isOpen)
+	{
+		//обработать
+	}
+	bool isSetBootInfo = NTFS_FileSystem->setBootInfo();
+	if(!isSetBootInfo)
+	{
+		//обработать
+	}
+
 
 
 }
@@ -40,19 +48,19 @@ __fastcall IteratorThread::IteratorThread(WCHAR *filePath, bool CreateSuspended)
 void __fastcall IteratorThread::Execute()
 {
 	// Определить размер кластера
-	int clusterSize = 4096;
+	int clusterSize = this->NTFS_FileSystem->getBytesPerCluster();
 	BYTE *dataBuffer = new BYTE[clusterSize];
 	MySearchThread = new SearchThread(dataBuffer,clusterSize,false);
 
 	// Перебор кластеров диска
-	for(int i = 0; i<10000; i++)
+	for(int i = 1; i < this->NTFS_FileSystem->getTotalClusters(); i++)
 	{
 		// Заблокировать доступ к буферу
 		//BufferAccessCS->Enter();
 
+		//Monitor->Enter(dataBuffer);
 		// Считать данные в локальный буфер
-		Sleep(50);
-
+		this->NTFS_FileSystem->readClusters(i,1,dataBuffer);
 		// Разблокировать доступ к буферу
 		//BufferAccessCS->Leave();
 

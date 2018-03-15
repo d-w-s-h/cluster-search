@@ -13,8 +13,6 @@ NTFS_FileSystemClass::NTFS_FileSystemClass()
 	FileHandle = 0;
 	TotalClusters=0;
 	ClusterFactor=1;
-	BytesPerSector= 4;
-	SectorPerCluster= 128;
 	BytesPerCluster=512;
 
 	// ... инициализация
@@ -42,22 +40,28 @@ bool NTFS_FileSystemClass::setBootInfo()
 	if (strcmp(pBootRecord->OEM_ID,"NTFS    ") == 0)
 	{
 		this->BytesPerCluster=pBootRecord->dBytesPerSector*pBootRecord->dSectorPerCluster;
+		this->TotalClusters=pBootRecord->dTotalSectors/ pBootRecord->dSectorPerCluster;
 		char *dtext = new char[512];
 		sprintf(dtext,"FINISHED DISK READING\n"
 							"OEM:%s\n"
 							"bytesPerSector:%d\n"
 							"sectorsPerCluster:%d\n"
 							"BytesPerCluster:%d\n"
+							"TotalClusters:%d\n"
 							"totalSectors:%d\n"
 							"volumeSerial:%d\n"
-							"headsCount:%d"
+							"headsCount:%d\n"
+							"dLCNofMFT:%d"
 							,pBootRecord->OEM_ID,
 							pBootRecord->dBytesPerSector,
 							pBootRecord->dSectorPerCluster,
 							this->BytesPerCluster,
+							this->TotalClusters,
 							pBootRecord->dTotalSectors,
+							this->TotalClusters,
 							pBootRecord->dSerialNumber,
-							pBootRecord->dHeadsCount
+							pBootRecord->dHeadsCount,
+							pBootRecord->dLCNofMFT
 							);
 		OutputDebugStringA(dtext);
 		return true;
@@ -85,7 +89,7 @@ bool NTFS_FileSystemClass::readClusters(ULONGLONG startCluster, DWORD numberOfCl
 	{
 		return false;
 	}
-	bool readResult = ReadFile(FileHandle,outBuffer,bytesToRead,&bytesRead,NULL);
+	bool readResult = ReadFile(this->FileHandle,outBuffer,bytesToRead,&bytesRead,NULL);
 	if(!readResult || bytesRead != bytesToRead)
 	{
 		return false;
@@ -114,5 +118,9 @@ bool NTFS_FileSystemClass::open(WCHAR *FileSystemPath)
 DWORD NTFS_FileSystemClass::getBytesPerCluster()
 {
 	return  BytesPerCluster;
+}
+DWORD NTFS_FileSystemClass::getTotalClusters()
+{
+	return  TotalClusters;
 }
 
