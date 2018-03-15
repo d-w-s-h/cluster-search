@@ -23,7 +23,7 @@ object MainForm: TMainForm
     EditLabel.Height = 13
     EditLabel.Caption = #1055#1091#1090#1100' '#1082' '#1088#1072#1079#1076#1077#1083#1091
     TabOrder = 0
-    Text = '\\.\C:'
+    Text = '\\.\E:'
   end
   object ResultTree: TVirtualStringTree
     Left = 8
@@ -39,15 +39,17 @@ object MainForm: TMainForm
     Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowHint, hoShowSortGlyphs, hoVisible]
     TabOrder = 1
     TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowHorzGridLines, toShowRoot, toShowTreeLines, toShowVertGridLines, toThemeAware, toUseBlendedImages]
+    OnGetText = ResultTreeGetText
     Columns = <
       item
         Position = 0
-        Width = 169
+        Width = 63
         WideText = 'id'
       end
       item
         Position = 1
-        WideText = 'inode'
+        Width = 156
+        WideText = 'cluster'
       end
       item
         Position = 2

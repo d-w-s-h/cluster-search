@@ -42,7 +42,7 @@ bool NTFS_FileSystemClass::setBootInfo()
 		this->BytesPerCluster=pBootRecord->dBytesPerSector*pBootRecord->dSectorPerCluster;
 		this->TotalClusters=pBootRecord->dTotalSectors/ pBootRecord->dSectorPerCluster;
 		char *dtext = new char[512];
-		sprintf(dtext,"FINISHED DISK READING\n"
+		sprintf(dtext,"SET BOOT INFO\n"
 							"OEM:%s\n"
 							"bytesPerSector:%d\n"
 							"sectorsPerCluster:%d\n"

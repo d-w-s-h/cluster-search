@@ -7,6 +7,7 @@
 #include "Main.h"
 
 
+
 #pragma package(smart_init)
 //---------------------------------------------------------------------------
 
@@ -27,10 +28,10 @@ __fastcall IteratorThread::IteratorThread(WCHAR *filePath, bool CreateSuspended)
 	: TThread(CreateSuspended)
 {
 	FreeOnTerminate = true;
+
 	// Открыть файловую систему
 	this->NTFS_FileSystem = new NTFS_FileSystemClass();
-	WCHAR *FileSystemPath =  L"\\\\.\\E:" ;
-	bool isOpen = NTFS_FileSystem->open(FileSystemPath);
+	bool isOpen = NTFS_FileSystem->open(filePath);
 	if(!isOpen)
 	{
 		//обработать
@@ -56,13 +57,12 @@ void __fastcall IteratorThread::Execute()
 	for(int i = 1; i < this->NTFS_FileSystem->getTotalClusters(); i++)
 	{
 		// Заблокировать доступ к буферу
-		//BufferAccessCS->Enter();
+		BufferAccessCS->Enter();
 
-		//Monitor->Enter(dataBuffer);
 		// Считать данные в локальный буфер
 		this->NTFS_FileSystem->readClusters(i,1,dataBuffer);
 		// Разблокировать доступ к буферу
-		//BufferAccessCS->Leave();
+		BufferAccessCS->Leave();
 
 		// Выставить флаг готовности буфера
 		MySearchThread->BufferReadyEvent->SetEvent();

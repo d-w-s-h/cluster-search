@@ -21,3 +21,18 @@ void __fastcall TMainForm::SearchButtonClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TMainForm::ResultTreeGetText(TBaseVirtualTree *Sender, PVirtualNode Node,
+		  TColumnIndex Column, TVSTTextType TextType, UnicodeString &CellText)
+{
+	if(!Node)	return;
+	DBstruct *nodeData = (DBstruct*)Sender->GetNodeData(Node);
+	switch(Column)
+	{
+		case 0: CellText = nodeData->id; break;
+		case 1: CellText = nodeData->cluster; break;
+		case 2: CellText = nodeData->type; break;
+	}
+}
+//---------------------------------------------------------------------------
+
+

@@ -25,10 +25,11 @@ __fastcall SearchThread::SearchThread(BYTE *dataBufferPtr, int clusterSize, bool
 	: TThread(CreateSuspended)
 {
 	FreeOnTerminate = true;
-
+	CurrentCluster = 1;
+	NodeId=1;
 	BufferReadyEvent  = new TEvent(NULL, true, false,"",false);
 	BufferCopiedEvent = new TEvent(NULL, true, false,"",false);
-	//BufferAccessCS = new TCriticalSection;
+	BufferAccessCS = new TCriticalSection;
 
 	ClusterSize = clusterSize;
 	OutBufferPtr = dataBufferPtr;
@@ -42,8 +43,7 @@ void __fastcall SearchThread::Execute()
 		// Ждать, пока не будет подготовлен буфер для копирования
 		if(BufferReadyEvent->WaitFor(WaitDelayMs) == wrSignaled)
 		{
-			//if(BufferAccessCS->TryEnter())
-			if(true)
+			if(BufferAccessCS->TryEnter())
 			{
 				// Скопировать данные
 				CopyData();
@@ -54,7 +54,8 @@ void __fastcall SearchThread::Execute()
 
 				// Запустить поиск
 				SearchData();
-				//BufferAccessCS->Leave();
+				CurrentCluster++;
+				BufferAccessCS->Leave();
 			}
 		}
 		if(Terminated) break;
@@ -93,6 +94,11 @@ void SearchThread::SearchData()
 void __fastcall SearchThread::AddMatch()
 {
 	PVirtualNode newNode = MainForm->ResultTree->AddChild(MainForm->ResultTree->RootNode);
+	DBstruct *nodeData = (DBstruct*)MainForm->ResultTree->GetNodeData(newNode);
+	nodeData->id  = NodeId;
+	nodeData->cluster = CurrentCluster;
+	wcscpy(nodeData->type, L"JFIF//Exif");
+	NodeId++;
 
 }
 //---------------------------------------------------------------------------

@@ -6,7 +6,7 @@
 #include <System.Classes.hpp>
 //---------------------------------------------------------------------------
 // Критическая секция добавления результатов поиска
-	//TCriticalSection *BufferAccessCS;
+TCriticalSection *BufferAccessCS;
 //---------------------------------------------------------------------------
 const int WaitDelayMs = 2000;
 //---------------------------------------------------------------------------
@@ -14,6 +14,8 @@ class SearchThread : public TThread
 {
 private:
 	int ClusterSize;
+	__int64 CurrentCluster;
+    int NodeId;
 	BYTE *OutBufferPtr;
 	BYTE *DataBuffer;
 	void CopyData();
