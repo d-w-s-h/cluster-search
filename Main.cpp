@@ -44,6 +44,10 @@ void __fastcall TMainForm::ResultTreeGetText(TBaseVirtualTree *Sender, PVirtualN
 
 void __fastcall TMainForm::FormClose(TObject *Sender, TCloseAction &Action)
 {
+	if(!myIteratorThread)
+	{
+	  return;
+	}
 	myIteratorThread->Terminate();
 }
 //---------------------------------------------------------------------------
@@ -51,6 +55,14 @@ void __fastcall TMainForm::FormClose(TObject *Sender, TCloseAction &Action)
 void __fastcall TMainForm::StopButtonClick(TObject *Sender)
 {
    myIteratorThread->Terminate();
+   //Application->MessageBoxW(L"Поиск завершен!", L"", MB_OK);
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TMainForm::FormDestroy(TObject *Sender)
+{
+	myIteratorThread->Terminate();
 }
 //---------------------------------------------------------------------------
 

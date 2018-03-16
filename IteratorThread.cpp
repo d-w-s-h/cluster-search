@@ -34,13 +34,23 @@ __fastcall IteratorThread::IteratorThread(WCHAR *filePath, bool CreateSuspended)
 	bool isOpen = NTFS_FileSystem->open(filePath);
 	if(!isOpen)
 	{
-		//обработать
+		this->Terminate();	//обработать
+		delete NTFS_FileSystem;
+		return;
 	}
 	bool isSetBootInfo = NTFS_FileSystem->setBootInfo();
 	if(!isSetBootInfo)
 	{
-		//обработать
+		this->Terminate();	//обработать
+		delete NTFS_FileSystem;
+		return;//обработать
 	}
+	MainForm->SearchButton->Enabled =false;
+	MainForm->StopButton->Enabled =true;
+	MainForm->CheckPNG->Enabled = false;
+	MainForm->CheckBMP->Enabled = false;
+	MainForm->ProgressBar->Max = this->NTFS_FileSystem->getTotalClusters();
+	MainForm->ProgressBar->Visible = true;
 
 
 
@@ -56,6 +66,8 @@ void __fastcall IteratorThread::Execute()
 	// ѕеребор кластеров диска
 	for(int i = 1; i < this->NTFS_FileSystem->getTotalClusters(); i++)
 	{
+		this->progress = i;
+		Synchronize(&IterationProgress);
 		// «аблокировать доступ к буферу
 		//BufferAccessCS->Enter();
 
@@ -81,7 +93,20 @@ void __fastcall IteratorThread::Execute()
 	delete[] dataBuffer;
 	NTFS_FileSystem->close();
 	delete NTFS_FileSystem;
+	Synchronize(&ActivateButtons);
 
 
+}
+void __fastcall IteratorThread::ActivateButtons()
+{
+	MainForm->SearchButton->Enabled =true;
+	MainForm->StopButton->Enabled =false;
+	MainForm->CheckPNG->Enabled = true;
+	MainForm->CheckBMP->Enabled = true;
+	MainForm->ProgressBar->Visible = false;
+}
+void __fastcall IteratorThread::IterationProgress()
+{
+	MainForm->ProgressBar->Position = this->progress;
 }
 //---------------------------------------------------------------------------

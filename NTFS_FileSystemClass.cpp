@@ -35,34 +35,27 @@ bool NTFS_FileSystemClass::setBootInfo()
 	}
 
 	this->pBootRecord = (NTFS_BootRecord*)dataBuffer;
-	if (strcmp(pBootRecord->OEM_ID,"NTFS    ") == 0)
+	if (!strcmp(pBootRecord->OEM_ID,"NTFS    "))
 	{
 		this->BytesPerCluster=pBootRecord->dBytesPerSector*pBootRecord->dSectorPerCluster;
 		this->TotalClusters=pBootRecord->dTotalSectors/ pBootRecord->dSectorPerCluster;
 
 		this->DebugInfo = new char[512];
-		sprintf(this->DebugInfo,"SET BOOT INFO\n"
-							"OEM:%s\n"
-							"bytesPerSector:%d\n"
-							"sectorsPerCluster:%d\n"
-							"BytesPerCluster:%d\n"
-							"TotalClusters:%d\n"
-							"totalSectors:%d\n"
-							"volumeSerial:%d\n"
-							"headsCount:%d\n"
-							"dLCNofMFT:%d"
+		sprintf(this->DebugInfo,"FileSystem: %s\n"
+							"BytesPerSector: %d\n"
+							"SectorsPerCluster: %d\n"
+							"BytesPerCluster: %d\n"
+							"TotalClusters: %d\n"
+							"TotalSectors: %d\n"
 							,pBootRecord->OEM_ID,
 							pBootRecord->dBytesPerSector,
 							pBootRecord->dSectorPerCluster,
 							this->BytesPerCluster,
 							this->TotalClusters,
-							pBootRecord->dTotalSectors,
-							this->TotalClusters,
-							pBootRecord->dSerialNumber,
-							pBootRecord->dHeadsCount,
-							pBootRecord->dLCNofMFT
+							pBootRecord->dTotalSectors
 							);
 		OutputDebugStringA(this->DebugInfo);
+		MainForm->FSinfoLabel->Caption = this->DebugInfo;
 		return true;
 	}
 
@@ -112,6 +105,7 @@ bool NTFS_FileSystemClass::open(WCHAR *FileSystemPath)
 		return FALSE;
 
 	}
+	return true;
 
 }
 DWORD NTFS_FileSystemClass::getBytesPerCluster()

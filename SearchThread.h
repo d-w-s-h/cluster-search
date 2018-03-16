@@ -22,11 +22,14 @@ private:
 	void SearchData();
 	void __fastcall AddMatch();
 	void __fastcall CompleteSearch();
+	WCHAR *Signature;
+	bool isChecked[3];
 
 protected:
 	void __fastcall Execute();
 public:
 	__fastcall SearchThread(BYTE *dataBufferPtr, int clusterSize, bool CreateSuspended);
+	void __fastcall SearchThread::GetCheckedBoxes();
 
 	// События, используемые для синхронизации
 	TEvent *BufferReadyEvent;

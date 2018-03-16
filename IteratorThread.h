@@ -15,11 +15,14 @@ private:
 	HANDLE FileSystemHandle;
 	SearchThread *MySearchThread;
 	BYTE *dataBuffer;
+	__int64 progress;
 
 protected:
 	void __fastcall Execute();
 public:
 	__fastcall IteratorThread(WCHAR *filePath, bool CreateSuspended);
+	void __fastcall IteratorThread::ActivateButtons();
+	void __fastcall IteratorThread::IterationProgress();
 };
 //---------------------------------------------------------------------------
 #endif
