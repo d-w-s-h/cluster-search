@@ -5,30 +5,16 @@
 
 #include "IteratorThread.h"
 #include "Main.h"
-
-
+#include <string>
+#include <sstream>
 
 #pragma package(smart_init)
-//---------------------------------------------------------------------------
-
-//   Important: Methods and properties of objects in VCL can only be
-//   used in a method called using Synchronize, for example:
-//
-//      Synchronize(&UpdateCaption);
-//
-//   where UpdateCaption could look like:
-//
-//      void __fastcall IteratorThread::UpdateCaption()
-//      {
-//        Form1->Caption = "Updated in a thread";
-//      }
 //---------------------------------------------------------------------------
 
 __fastcall IteratorThread::IteratorThread(WCHAR *filePath, bool CreateSuspended)
 	: TThread(CreateSuspended)
 {
 	FreeOnTerminate = true;
-
 	// Открыть файловую систему
 	this->NTFS_FileSystem = new NTFS_FileSystemClass();
 	bool isOpen = NTFS_FileSystem->open(filePath);
@@ -51,8 +37,7 @@ __fastcall IteratorThread::IteratorThread(WCHAR *filePath, bool CreateSuspended)
 	MainForm->CheckBMP->Enabled = false;
 	MainForm->ProgressBar->Max = this->NTFS_FileSystem->getTotalClusters();
 	MainForm->ProgressBar->Visible = true;
-
-
+    MainForm->ProgressLabel->Visible = true;
 
 }
 //---------------------------------------------------------------------------
@@ -78,7 +63,6 @@ void __fastcall IteratorThread::Execute()
 
 		// Выставить флаг готовности буфера
 		MySearchThread->BufferReadyEvent->SetEvent();
-
 		// Ожидать окончания копирования буфера
 		while(MySearchThread->BufferCopiedEvent->WaitFor(WaitDelayMs) != wrSignaled)
 		{
@@ -86,16 +70,13 @@ void __fastcall IteratorThread::Execute()
         MySearchThread->BufferCopiedEvent->ResetEvent();
        	if(Terminated) break;
 	}
-
-
 	// Завершить поиск
 	MySearchThread->Terminate();
 	delete[] dataBuffer;
 	NTFS_FileSystem->close();
 	delete NTFS_FileSystem;
 	Synchronize(&ActivateButtons);
-	return;
-
+    return;
 }
 void __fastcall IteratorThread::ActivateButtons()
 {
@@ -104,9 +85,14 @@ void __fastcall IteratorThread::ActivateButtons()
 	MainForm->CheckPNG->Enabled = true;
 	MainForm->CheckBMP->Enabled = true;
 	MainForm->ProgressBar->Visible = false;
+    MainForm->ProgressLabel->Visible = false;
+    MainForm->isTerminated = true;
 }
 void __fastcall IteratorThread::IterationProgress()
 {
 	MainForm->ProgressBar->Position = this->progress;
+    std::stringstream ProgressStr;
+    ProgressStr << "cluster "<< this->progress << " of "<< this->NTFS_FileSystem->getTotalClusters();
+    MainForm->ProgressLabel->Caption = ProgressStr.str().c_str();
 }
 //---------------------------------------------------------------------------

@@ -10,7 +10,7 @@
 #pragma resource "*.dfm"
 TMainForm *MainForm;
 IteratorThread *myIteratorThread;
-bool isTerminated;
+
 
 //---------------------------------------------------------------------------
 __fastcall TMainForm::TMainForm(TComponent* Owner)
@@ -41,17 +41,14 @@ void __fastcall TMainForm::ResultTreeGetText(TBaseVirtualTree *Sender, PVirtualN
 	}
 }
 //---------------------------------------------------------------------------
-
-
-
-
 void __fastcall TMainForm::FormClose(TObject *Sender, TCloseAction &Action)
 {
 	if(isTerminated)
 	{
 	  return;
 	}
-   	myIteratorThread->Terminate();
+    myIteratorThread->Terminate();
+
 }
 //---------------------------------------------------------------------------
 

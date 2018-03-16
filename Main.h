@@ -32,6 +32,7 @@ __published:	// IDE-managed Components
 	TCheckBox *CheckPNG;
 	TCheckBox *CheckBMP;
 	TProgressBar *ProgressBar;
+    TLabel *ProgressLabel;
 	void __fastcall SearchButtonClick(TObject *Sender);
 	void __fastcall ResultTreeGetText(TBaseVirtualTree *Sender, PVirtualNode Node, TColumnIndex Column,
           TVSTTextType TextType, UnicodeString &CellText);
@@ -40,6 +41,7 @@ __published:	// IDE-managed Components
 private:	// User declarations
 public:		// User declarations
 	__fastcall TMainForm(TComponent* Owner);
+    bool isTerminated;
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TMainForm *MainForm;

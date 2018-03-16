@@ -21,6 +21,13 @@ object MainForm: TMainForm
     Width = 3
     Height = 13
   end
+  object ProgressLabel: TLabel
+    Left = 128
+    Top = 379
+    Width = 3
+    Height = 13
+    Visible = False
+  end
   object PathEdit: TLabeledEdit
     Left = 8
     Top = 24
