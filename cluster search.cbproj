@@ -106,9 +106,12 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <LinkPackageImports>rtl.bpi;vcl.bpi;vclx.bpi</LinkPackageImports>
         <BT_BuildType>Debug</BT_BuildType>
-        <LinkPackageStatics>VirtualTreesR.lib</LinkPackageStatics>
+        <LinkPackageStatics>rtl.lib;vcl.lib;VirtualTreesR.lib;vclx.lib</LinkPackageStatics>
+        <UsePackages>false</UsePackages>
+        <DynamicRTL>false</DynamicRTL>
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <BCC_AllCodeguardOptions>false</BCC_AllCodeguardOptions>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <Defines>NDEBUG;$(Defines)</Defines>
@@ -218,10 +221,9 @@
                     <ProjectProperties Name="IndexFiles">False</ProjectProperties>
                 </ProjectProperties>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k190.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp190.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k190.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp190.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k250.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp250.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\19.0\BPL\VirtualTreesCD240.bpl">VirtualTree CBuilder designtime package</Excluded_Packages>
                 </Excluded_Packages>
                 <Folders>
                     <Folder Path="C:\Users\Dmitry-N56V\Desktop\учёба\10 семестр\ИБТС(хорьков)\LABA4\MyThread\VirtualTreeView\Source" Masks="*.*" ShowSubdirectories="false"/>

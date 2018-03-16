@@ -1,7 +1,7 @@
 object MainForm: TMainForm
   Left = 0
   Top = 0
-  BorderStyle = bsDialog
+  BorderStyle = bsSingle
   Caption = 'ClusterSearch'
   ClientHeight = 423
   ClientWidth = 265
@@ -13,7 +13,6 @@ object MainForm: TMainForm
   Font.Style = []
   OldCreateOrder = False
   OnClose = FormClose
-  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
   object FSinfoLabel: TLabel
@@ -45,7 +44,7 @@ object MainForm: TMainForm
     Header.Font.Name = 'Tahoma'
     Header.Font.Style = []
     Header.Height = 15
-    Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible, hoAutoSpring]
+    Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible, hoAutoSpring]
     ParentShowHint = False
     ScrollBarOptions.AlwaysVisible = True
     ScrollBarOptions.ScrollBars = ssVertical
@@ -61,12 +60,12 @@ object MainForm: TMainForm
     Columns = <
       item
         Position = 0
-        Width = 44
+        Width = 56
         WideText = 'id'
       end
       item
         Position = 1
-        Width = 77
+        Width = 117
         WideText = 'cluster'
       end
       item

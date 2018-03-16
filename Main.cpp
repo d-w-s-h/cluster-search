@@ -10,18 +10,21 @@
 #pragma resource "*.dfm"
 TMainForm *MainForm;
 IteratorThread *myIteratorThread;
+bool isTerminated;
 
 //---------------------------------------------------------------------------
 __fastcall TMainForm::TMainForm(TComponent* Owner)
 	: TForm(Owner)
 {
 	ResultTree->NodeDataSize = sizeof(DBstruct);
+    isTerminated=true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::SearchButtonClick(TObject *Sender)
 {
 	ResultTree-> Clear();
 	myIteratorThread = new IteratorThread(PathEdit->Text.c_str(), false);
+    isTerminated = false;
 }
 //---------------------------------------------------------------------------
 
@@ -44,25 +47,24 @@ void __fastcall TMainForm::ResultTreeGetText(TBaseVirtualTree *Sender, PVirtualN
 
 void __fastcall TMainForm::FormClose(TObject *Sender, TCloseAction &Action)
 {
-	if(!myIteratorThread)
+	if(isTerminated)
 	{
 	  return;
 	}
-	myIteratorThread->Terminate();
+   	myIteratorThread->Terminate();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TMainForm::StopButtonClick(TObject *Sender)
 {
    myIteratorThread->Terminate();
+   isTerminated =true;
+
    //Application->MessageBoxW(L"Поиск завершен!", L"", MB_OK);
 }
 //---------------------------------------------------------------------------
 
 
-void __fastcall TMainForm::FormDestroy(TObject *Sender)
-{
-	myIteratorThread->Terminate();
-}
-//---------------------------------------------------------------------------
+
+
 

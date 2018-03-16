@@ -94,7 +94,7 @@ void __fastcall IteratorThread::Execute()
 	NTFS_FileSystem->close();
 	delete NTFS_FileSystem;
 	Synchronize(&ActivateButtons);
-
+	return;
 
 }
 void __fastcall IteratorThread::ActivateButtons()

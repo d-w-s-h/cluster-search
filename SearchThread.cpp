@@ -67,7 +67,8 @@ void __fastcall SearchThread::Execute()
 	delete BufferAccessCS;
   // Удалить буфер
 	delete[] DataBuffer;
-	Synchronize(&CompleteSearch);
+	//Synchronize(&CompleteSearch);
+    return;
 }
 //---------------------------------------------------------------------------
 void SearchThread::CopyData()
