@@ -3,6 +3,8 @@
 #ifndef NTFS_FileSystemClassH
 #define NTFS_FileSystemClassH
 #include <windows.h>
+#include <string>
+using namespace std;
 //---------------------------------------------------------------------------
 #endif
 
@@ -46,7 +48,7 @@ protected:
 
 public:
 	NTFS_FileSystemClass();
-	bool open(WCHAR *FileSystemPath);
+	bool open(wstring FileSystemPath);
 	bool setBootInfo();
 	DWORD getTotalClusters();
 	DWORD getBytesPerCluster();

@@ -20,7 +20,7 @@ private:
 protected:
 	void __fastcall Execute();
 public:
-	__fastcall IteratorThread(WCHAR *filePath, bool CreateSuspended);
+	__fastcall IteratorThread(wstring filePath, bool CreateSuspended);
 	void __fastcall IteratorThread::ActivateButtons();
 	void __fastcall IteratorThread::IterationProgress();
 };

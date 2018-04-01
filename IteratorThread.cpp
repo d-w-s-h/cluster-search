@@ -7,11 +7,13 @@
 #include "Main.h"
 #include <string>
 #include <sstream>
+#include <vector>
+
 
 #pragma package(smart_init)
 //---------------------------------------------------------------------------
 
-__fastcall IteratorThread::IteratorThread(WCHAR *filePath, bool CreateSuspended)
+__fastcall IteratorThread::IteratorThread(wstring filePath, bool CreateSuspended)
 	: TThread(CreateSuspended)
 {
 	FreeOnTerminate = true;

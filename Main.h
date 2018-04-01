@@ -10,12 +10,14 @@
 #include "VirtualTrees.hpp"
 #include <Vcl.ExtCtrls.hpp>
 #include <Vcl.ComCtrls.hpp>
+#include <string>
+using namespace std;
 //---------------------------------------------------------------------------
 typedef struct
 {
 	int id;
 	__int64 cluster;
-	WCHAR type[16];
+	string type;
 
 } DBstruct;
 

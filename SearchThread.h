@@ -2,6 +2,7 @@
 
 #ifndef SearchThreadH
 #define SearchThreadH
+using namespace std;
 //---------------------------------------------------------------------------
 #include <System.Classes.hpp>
 //---------------------------------------------------------------------------
@@ -22,7 +23,7 @@ private:
 	void SearchData();
 	void __fastcall AddMatch();
 	void __fastcall CompleteSearch();
-	WCHAR *Signature;
+	CHAR *SignatureName;
 	bool isChecked[3];
 
 protected:

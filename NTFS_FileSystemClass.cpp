@@ -4,6 +4,11 @@
 
 #include "NTFS_FileSystemClass.h"
 #include <windows.h>
+#include <string>
+#include <sstream>
+#include <iostream>
+using namespace std;
+
 #include "Main.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
@@ -40,22 +45,16 @@ bool NTFS_FileSystemClass::setBootInfo()
 		this->BytesPerCluster=pBootRecord->dBytesPerSector*pBootRecord->dSectorPerCluster;
 		this->TotalClusters=pBootRecord->dTotalSectors/ pBootRecord->dSectorPerCluster;
 
-		this->DebugInfo = new char[512];
-		sprintf(this->DebugInfo,"FileSystem: %s\n"
-							"BytesPerSector: %d\n"
-							"SectorsPerCluster: %d\n"
-							"BytesPerCluster: %d\n"
-							"TotalClusters: %d\n"
-							"TotalSectors: %d\n"
-							,pBootRecord->OEM_ID,
-							pBootRecord->dBytesPerSector,
-							pBootRecord->dSectorPerCluster,
-							this->BytesPerCluster,
-							this->TotalClusters,
-							pBootRecord->dTotalSectors
-							);
-		OutputDebugStringA(this->DebugInfo);
-		MainForm->FSinfoLabel->Caption = this->DebugInfo;
+        stringstream DebugInfo;
+        DebugInfo << "FileSystem: "<<                 pBootRecord->OEM_ID <<  \
+                     "\nSectorsPerCluster: " <<       int(pBootRecord->dSectorPerCluster) << \
+                     "\nBytesPerSector: " <<          pBootRecord->dBytesPerSector <<  \
+                     "\nBytesPerCluster: " <<         this->BytesPerCluster << \
+                     "\nTotalClusters: " <<           this->TotalClusters << \
+                     "\nTotalSectors: " <<            pBootRecord->dTotalSectors;
+
+		OutputDebugStringA(DebugInfo.str().c_str());
+		MainForm->FSinfoLabel->Caption = DebugInfo.str().c_str();
 		return true;
 	}
 
@@ -87,10 +86,10 @@ bool NTFS_FileSystemClass::readClusters(ULONGLONG startCluster, DWORD numberOfCl
 		return false;
 	}
 }
-bool NTFS_FileSystemClass::open(WCHAR *FileSystemPath)
+bool NTFS_FileSystemClass::open(wstring FileSystemPath)
 {
     this->FileHandle = CreateFileW(
-			FileSystemPath, // Имя файла (WCHAR*)
+			FileSystemPath.c_str(), // Имя файла (WCHAR*)
 			GENERIC_READ,	  // Режим доступа
 			FILE_SHARE_READ | FILE_SHARE_WRITE, // Режим совместной работы
 			NULL, // Атрибуты безопасности
@@ -120,6 +119,6 @@ DWORD NTFS_FileSystemClass::getTotalClusters()
 void NTFS_FileSystemClass::close()
 {
 	CloseHandle(this->FileHandle);
-	delete[] this->DebugInfo;
+
 }
 

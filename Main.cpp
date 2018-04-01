@@ -37,7 +37,7 @@ void __fastcall TMainForm::ResultTreeGetText(TBaseVirtualTree *Sender, PVirtualN
 	{
 		case 0: CellText = nodeData->id; break;
 		case 1: CellText = nodeData->cluster; break;
-		case 2: CellText = nodeData->type; break;
+		case 2: CellText = nodeData->type.c_str(); break;
 	}
 }
 //---------------------------------------------------------------------------

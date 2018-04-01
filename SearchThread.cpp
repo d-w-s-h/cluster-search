@@ -5,6 +5,8 @@
 
 #include "SearchThread.h"
 #include "Main.h"
+#include <vector>
+using namespace std;
 #pragma package(smart_init)
 //---------------------------------------------------------------------------
 
@@ -79,33 +81,36 @@ void SearchThread::CopyData()
 void SearchThread::SearchData()
 {
 	// Провести поиск
-	char *Signature1 = "JFIF";       //jpg
-	char *Signature2 = "Exif";       //jpg
-	char *Signature3 ="PNG";
-	char *Signature4 ="BM";         //bmp
-	bool matchFound1 = memcmp(OutBufferPtr+6 , Signature1, 4);
-	bool matchFound2 = memcmp(OutBufferPtr+6 , Signature2, 4);
+    vector<string> Signatures(4);
+
+    Signatures[0]= "JFIF";
+    Signatures[1]= "Exif";
+    Signatures[2]= "PNG";
+    Signatures[3]= "BM";
+
+	bool matchFound1 = memcmp(OutBufferPtr+6 , Signatures[0].c_str(), Signatures[0].length());
+	bool matchFound2 = memcmp(OutBufferPtr+6 , Signatures[1].c_str(), Signatures[1].length());
 
 
 	if(!matchFound1 ||!matchFound2 )
 	{
-		Signature = L"jpeg";
+		SignatureName = "jpeg";
 		Synchronize(&AddMatch);
 	}
 
 	if(this->isChecked[0])
 	{
-		if(!memcmp(OutBufferPtr+1 , Signature3, 3))
+		if(!memcmp(OutBufferPtr+1 , Signatures[2].c_str(), Signatures[2].length()))
 		{
-			Signature = L"png";
+			SignatureName = "png";
 			Synchronize(&AddMatch);
 		}
 	}
 	if(this->isChecked[1])
 	{
-		if(!memcmp(OutBufferPtr , Signature4, 2))
+		if(!memcmp(OutBufferPtr , Signatures[3].c_str(), Signatures[3].length()))
 		{
-			Signature = L"bmp";
+			SignatureName = "bmp";
 			Synchronize(&AddMatch);
 		}
 	}
@@ -117,7 +122,7 @@ void __fastcall SearchThread::AddMatch()
 	DBstruct *nodeData = (DBstruct*)MainForm->ResultTree->GetNodeData(newNode);
 	nodeData->id  = NodeId;
 	nodeData->cluster = CurrentCluster;
-	wcscpy(nodeData->type, Signature);
+    nodeData->type = SignatureName;
 	NodeId++;
 }
 void __fastcall SearchThread::GetCheckedBoxes()
