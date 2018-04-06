@@ -32,7 +32,7 @@ typedef struct
 	ULONGLONG dSerialNumber;  //72 48
     BYTE dDataCode[432];
 } NTFS_BootRecord;
-
+//---------------------------------------------------------------------------
 #pragma pack(pop)
 
 class NTFS_FileSystemClass
@@ -55,3 +55,6 @@ public:
 	bool readClusters(ULONGLONG startCluster, DWORD numberOfClusters, BYTE *outBuffer);
 	void close();
 } ;
+//---------------------------------------------------------------------------
+
+

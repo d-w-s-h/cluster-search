@@ -23,11 +23,11 @@ using namespace std;
 //      }
 //---------------------------------------------------------------------------
 
-__fastcall SearchThread::SearchThread(BYTE *dataBufferPtr, int clusterSize, bool CreateSuspended)
+__fastcall SearchThread::SearchThread(BYTE *dataBufferPtr, int clusterSize, __int64 *progress, bool CreateSuspended)
 	: TThread(CreateSuspended)
 {
 	FreeOnTerminate = true;
-	CurrentCluster = 1;
+	CurrentIteratorCluster = progress; //ссылка
 	NodeId=1;
 	BufferReadyEvent  = new TEvent(NULL, true, false,"",false);
 	BufferCopiedEvent = new TEvent(NULL, true, false,"",false);
@@ -37,6 +37,12 @@ __fastcall SearchThread::SearchThread(BYTE *dataBufferPtr, int clusterSize, bool
 	ClusterSize = clusterSize;
 	OutBufferPtr = dataBufferPtr;
 	DataBuffer = new BYTE[clusterSize];
+
+    Signatures.reserve(16);
+    Signatures[0]= "JFIF";
+    Signatures[1]= "Exif";
+    Signatures[2]= "PNG";
+    Signatures[3]= "BM";
 }
 //---------------------------------------------------------------------------
 void __fastcall SearchThread::Execute()
@@ -48,6 +54,7 @@ void __fastcall SearchThread::Execute()
 		{
 			if(BufferAccessCS->TryEnter())
 			{
+				FixedCurrentCluster = *CurrentIteratorCluster;  //чтобы не убежал
 				// Скопировать данные
 				CopyData();
 
@@ -57,7 +64,7 @@ void __fastcall SearchThread::Execute()
 				BufferAccessCS->Leave();
 				// Запустить поиск
 				SearchData();
-				CurrentCluster++;
+//				CurrentCluster++;
 
 			}
 		}
@@ -80,17 +87,9 @@ void SearchThread::CopyData()
 //---------------------------------------------------------------------------
 void SearchThread::SearchData()
 {
-	// Провести поиск
-    vector<string> Signatures(4);
-
-    Signatures[0]= "JFIF";
-    Signatures[1]= "Exif";
-    Signatures[2]= "PNG";
-    Signatures[3]= "BM";
-
+	// Проведем поиск
 	bool matchFound1 = memcmp(OutBufferPtr+6 , Signatures[0].c_str(), Signatures[0].length());
 	bool matchFound2 = memcmp(OutBufferPtr+6 , Signatures[1].c_str(), Signatures[1].length());
-
 
 	if(!matchFound1 ||!matchFound2 )
 	{
@@ -121,7 +120,7 @@ void __fastcall SearchThread::AddMatch()
 	PVirtualNode newNode = MainForm->ResultTree->AddChild(MainForm->ResultTree->RootNode);
 	DBstruct *nodeData = (DBstruct*)MainForm->ResultTree->GetNodeData(newNode);
 	nodeData->id  = NodeId;
-	nodeData->cluster = CurrentCluster;
+	nodeData->cluster = FixedCurrentCluster;
     nodeData->type = SignatureName;
 	NodeId++;
 }
@@ -131,11 +130,4 @@ void __fastcall SearchThread::GetCheckedBoxes()
 	 this->isChecked[1] = MainForm->CheckBMP->Checked;
 }
 //---------------------------------------------------------------------------
-void __fastcall SearchThread::CompleteSearch()
-{
-	  //if(!MainForm->OnClose)
-	  //{
-	 //		Application->MessageBoxW(L"Поиск завершен!", L"", MB_OK);
-	  //}
 
-}

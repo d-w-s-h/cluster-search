@@ -2,9 +2,12 @@
 
 #ifndef SearchThreadH
 #define SearchThreadH
-using namespace std;
+
 //---------------------------------------------------------------------------
 #include <System.Classes.hpp>
+#include <string>
+#include <vector>
+using namespace std;
 //---------------------------------------------------------------------------
 // Критическая секция добавления результатов поиска
 TCriticalSection *BufferAccessCS;
@@ -15,21 +18,23 @@ class SearchThread : public TThread
 {
 private:
 	int ClusterSize;
-	__int64 CurrentCluster;
-    int NodeId;
+	int NodeId;
 	BYTE *OutBufferPtr;
 	BYTE *DataBuffer;
 	void CopyData();
 	void SearchData();
 	void __fastcall AddMatch();
-	void __fastcall CompleteSearch();
-	CHAR *SignatureName;
+	string SignatureName;
 	bool isChecked[3];
+	__int64 *CurrentIteratorCluster;
+	__int64 FixedCurrentCluster;
+
 
 protected:
 	void __fastcall Execute();
+    vector<string> Signatures;
 public:
-	__fastcall SearchThread(BYTE *dataBufferPtr, int clusterSize, bool CreateSuspended);
+	__fastcall SearchThread(BYTE *dataBufferPtr, int clusterSize, __int64 *progress , bool CreateSuspended);
 	void __fastcall SearchThread::GetCheckedBoxes();
 
 	// События, используемые для синхронизации

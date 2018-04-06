@@ -4,6 +4,7 @@
 #pragma hdrstop
 
 #include "IteratorThread.h"
+
 #include "Main.h"
 #include <string>
 #include <sstream>
@@ -39,7 +40,12 @@ __fastcall IteratorThread::IteratorThread(wstring filePath, bool CreateSuspended
 	MainForm->CheckBMP->Enabled = false;
 	MainForm->ProgressBar->Max = this->NTFS_FileSystem->getTotalClusters();
 	MainForm->ProgressBar->Visible = true;
-    MainForm->ProgressLabel->Visible = true;
+	MainForm->ProgressLabel->Visible = true;
+	MainForm->BitmapButton->Enabled =false;
+	MainForm->FreeMemModeCheckBox->Enabled = false;
+
+
+
 
 }
 //---------------------------------------------------------------------------
@@ -48,30 +54,56 @@ void __fastcall IteratorThread::Execute()
 	// Определить размер кластера
 	int clusterSize = this->NTFS_FileSystem->getBytesPerCluster();
 	dataBuffer = new BYTE[clusterSize];
-	MySearchThread = new SearchThread(dataBuffer,clusterSize,false);
+	MySearchThread = new SearchThread(dataBuffer,clusterSize, &this->progress, false);
 
 	// Перебор кластеров диска
-	for(int i = 1; i < this->NTFS_FileSystem->getTotalClusters(); i++)
+	Iterator<NTFS_FileSystemClass> *it;
+
+	if(MainForm->FreeMemModeCheckBox->Checked)
 	{
-		this->progress = i;
+		it = new FreeMemoryModeIteratorDecorator<NTFS_FileSystemClass>( new  ClusterIterator<NTFS_FileSystemClass>(this->NTFS_FileSystem),\
+																		MainForm->BitmapBuffer\
+																		);
+	}
+	else it = new IteratorDecorator<NTFS_FileSystemClass>(new  ClusterIterator<NTFS_FileSystemClass>(this->NTFS_FileSystem));
+
+	for(it->First(&this->progress);!it->IsDone(); it->Next(&this->progress))
+	{
 		Synchronize(&IterationProgress);
-		// Заблокировать доступ к буферу
-		//BufferAccessCS->Enter();
 
-		// Считать данные в локальный буфер
-		this->NTFS_FileSystem->readClusters(i,1,dataBuffer);
-		// Разблокировать доступ к буферу
-		//BufferAccessCS->Leave();
+        it->GetCurrentCluster(dataBuffer);
 
-		// Выставить флаг готовности буфера
-		MySearchThread->BufferReadyEvent->SetEvent();
-		// Ожидать окончания копирования буфера
-		while(MySearchThread->BufferCopiedEvent->WaitFor(WaitDelayMs) != wrSignaled)
+        MySearchThread->BufferReadyEvent->SetEvent();
+        while(MySearchThread->BufferCopiedEvent->WaitFor(WaitDelayMs) != wrSignaled)
 		{
 		}
         MySearchThread->BufferCopiedEvent->ResetEvent();
        	if(Terminated) break;
-	}
+    }
+    delete it;
+
+
+//	for(int i = 1; i < this->NTFS_FileSystem->getTotalClusters(); i++)
+//	{
+//		this->progress = i;
+//		Synchronize(&IterationProgress);
+//		// Заблокировать доступ к буферу
+//		//BufferAccessCS->Enter();
+//
+//		// Считать данные в локальный буфер
+//		this->NTFS_FileSystem->readClusters(i,1,dataBuffer);
+//		// Разблокировать доступ к буферу
+//		//BufferAccessCS->Leave();
+//
+//		// Выставить флаг готовности буфера
+//		MySearchThread->BufferReadyEvent->SetEvent();
+//		// Ожидать окончания копирования буфера
+//		while(MySearchThread->BufferCopiedEvent->WaitFor(WaitDelayMs) != wrSignaled)
+//		{
+//		}
+//        MySearchThread->BufferCopiedEvent->ResetEvent();
+//       	if(Terminated) break;
+//	}
 	// Завершить поиск
 	MySearchThread->Terminate();
 	delete[] dataBuffer;
@@ -88,7 +120,12 @@ void __fastcall IteratorThread::ActivateButtons()
 	MainForm->CheckBMP->Enabled = true;
 	MainForm->ProgressBar->Visible = false;
     MainForm->ProgressLabel->Visible = false;
-    MainForm->isTerminated = true;
+	MainForm->isTerminated = true;
+	MainForm->BitmapButton->Enabled =true;
+	if(MainForm->BitmapBuffer != NULL )
+	{
+		MainForm->FreeMemModeCheckBox->Enabled = true;
+    }
 }
 void __fastcall IteratorThread::IterationProgress()
 {

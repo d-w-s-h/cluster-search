@@ -10,6 +10,7 @@
 #include "VirtualTrees.hpp"
 #include <Vcl.ExtCtrls.hpp>
 #include <Vcl.ComCtrls.hpp>
+#include <Vcl.Dialogs.hpp>
 #include <string>
 using namespace std;
 //---------------------------------------------------------------------------
@@ -35,15 +36,22 @@ __published:	// IDE-managed Components
 	TCheckBox *CheckBMP;
 	TProgressBar *ProgressBar;
     TLabel *ProgressLabel;
+    TButton *BitmapButton;
+	TOpenDialog *OpenBitmapDialog;
+	TLabel *BitmapLabel;
+	TCheckBox *FreeMemModeCheckBox;
 	void __fastcall SearchButtonClick(TObject *Sender);
 	void __fastcall ResultTreeGetText(TBaseVirtualTree *Sender, PVirtualNode Node, TColumnIndex Column,
           TVSTTextType TextType, UnicodeString &CellText);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall StopButtonClick(TObject *Sender);
+	void __fastcall BitmapButtonClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TMainForm(TComponent* Owner);
-    bool isTerminated;
+	bool isTerminated;
+	BYTE *BitmapBuffer;
+
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TMainForm *MainForm;

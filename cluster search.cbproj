@@ -118,8 +118,16 @@
         <TASM_Debugging>None</TASM_Debugging>
     </PropertyGroup>
     <ItemGroup>
+        <CppCompile Include="ClstItDecorator.cpp">
+            <DependentOn>ClstItDecorator.h</DependentOn>
+            <BuildOrder>7</BuildOrder>
+        </CppCompile>
         <CppCompile Include="cluster search.cpp">
             <BuildOrder>0</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="ClusterIterator.cpp">
+            <DependentOn>ClusterIterator.h</DependentOn>
+            <BuildOrder>6</BuildOrder>
         </CppCompile>
         <CppCompile Include="IteratorThread.cpp">
             <DependentOn>IteratorThread.h</DependentOn>

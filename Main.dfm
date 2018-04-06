@@ -3,8 +3,8 @@ object MainForm: TMainForm
   Top = 0
   BorderStyle = bsSingle
   Caption = 'ClusterSearch'
-  ClientHeight = 423
-  ClientWidth = 265
+  ClientHeight = 450
+  ClientWidth = 291
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -22,16 +22,23 @@ object MainForm: TMainForm
     Height = 13
   end
   object ProgressLabel: TLabel
-    Left = 128
-    Top = 379
+    Left = 8
+    Top = 412
+    Width = 96
+    Height = 13
+    Caption = '2432342342342342'
+    Visible = False
+  end
+  object BitmapLabel: TLabel
+    Left = 138
+    Top = 400
     Width = 3
     Height = 13
-    Visible = False
   end
   object PathEdit: TLabeledEdit
     Left = 8
     Top = 24
-    Width = 249
+    Width = 273
     Height = 21
     EditLabel.Width = 79
     EditLabel.Height = 13
@@ -42,7 +49,7 @@ object MainForm: TMainForm
   object ResultTree: TVirtualStringTree
     Left = 8
     Top = 96
-    Width = 249
+    Width = 273
     Height = 233
     Header.AutoSizeIndex = 0
     Header.Font.Charset = DEFAULT_CHARSET
@@ -72,7 +79,7 @@ object MainForm: TMainForm
       end
       item
         Position = 1
-        Width = 117
+        Width = 128
         WideText = 'cluster'
       end
       item
@@ -84,14 +91,14 @@ object MainForm: TMainForm
   object SearchButton: TButton
     Left = 8
     Top = 51
-    Width = 121
+    Width = 138
     Height = 39
     Caption = #1055#1086#1080#1089#1082'!'
     TabOrder = 2
     OnClick = SearchButtonClick
   end
   object StopButton: TButton
-    Left = 128
+    Left = 152
     Top = 51
     Width = 129
     Height = 39
@@ -101,29 +108,55 @@ object MainForm: TMainForm
     OnClick = StopButtonClick
   end
   object CheckPNG: TCheckBox
-    Left = 216
+    Left = 240
     Top = 335
     Width = 41
     Height = 17
     Caption = 'png'
+    Checked = True
+    State = cbChecked
     TabOrder = 4
   end
   object CheckBMP: TCheckBox
-    Left = 216
+    Left = 240
     Top = 358
     Width = 41
     Height = 17
     Caption = 'bmp'
+    Checked = True
+    State = cbChecked
     TabOrder = 5
   end
   object ProgressBar: TProgressBar
-    Left = 128
-    Top = 398
-    Width = 129
+    Left = 8
+    Top = 431
+    Width = 273
     Height = 11
     Smooth = True
     Step = 1
     TabOrder = 6
     Visible = False
+  end
+  object BitmapButton: TButton
+    Left = 136
+    Top = 335
+    Width = 98
+    Height = 41
+    Caption = 'Bitmap..'
+    TabOrder = 7
+    OnClick = BitmapButtonClick
+  end
+  object FreeMemModeCheckBox: TCheckBox
+    Left = 138
+    Top = 381
+    Width = 145
+    Height = 17
+    Caption = 'search in free space only'
+    Enabled = False
+    TabOrder = 8
+  end
+  object OpenBitmapDialog: TOpenDialog
+    Left = 176
+    Top = 272
   end
 end
