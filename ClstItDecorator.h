@@ -12,44 +12,53 @@ template<class Type1> class IteratorDecorator : public Iterator<Type1>
 {
 	protected:
 		Iterator<Type1> *It; //указатель на итератор
+		__int64 Progress  ;
 
 	public:
-		IteratorDecorator(Iterator<Type1> *it){It = it;};
+		IteratorDecorator(Iterator<Type1> *it ){It = it;};
 		virtual ~IteratorDecorator(){delete It;};
-		virtual void First(__int64 *progress){It->First(progress);};
-		virtual void Next(__int64 *progress){It->Next(progress);};
+		virtual void First(){It->First(); };
+		virtual void Next(){It->Next();};
 		virtual bool IsDone() const {return It->IsDone();};
-		virtual void GetCurrentCluster(BYTE *outBuffer) const {It->GetCurrentCluster(outBuffer);};
+		virtual void GetCurrent(Type1 *out) const {It->GetCurrent(out);};
+		virtual __int64 GetCurrentIndex(){return It->GetCurrentIndex();};
 };
-//---------------------------------------------------------------------------
+////---------------------------------------------------------------------------
 //декоратор для Free Memory Mode
 template<class Type1> class FreeMemoryModeIteratorDecorator : public IteratorDecorator<Type1>
 {
 	protected:
-		ClusterIterator<Type1> *It; //указатель на итератор
+		NTFSClusterIterator<Type1> *It; //указатель на итератор
 		BYTE *Bitmap;
+		__int64 localprogress;
 	public:
-		FreeMemoryModeIteratorDecorator(ClusterIterator<Type1> *it, BYTE *bitmapBuffer)	: IteratorDecorator<Type1>(it)
+		FreeMemoryModeIteratorDecorator(NTFSClusterIterator<Type1> *it, BYTE *bitmapBuffer)	: IteratorDecorator<Type1>(it)
 		{
 			this->It=it;
 			this->Bitmap = bitmapBuffer;
+			localprogress =1;
+
 		}
 		virtual ~FreeMemoryModeIteratorDecorator(){delete It;};
-		virtual void First(__int64 *progress)
+		virtual void First()
 		{
-			It->First(progress);
+			It->First();
+			localprogress =1;
 		};
-		virtual void Next(__int64 *progress)
+		virtual void Next()
 		{
-			for(It->Next(progress); !It->IsDone(); It->Next(progress))
+			for(It->Next(); !It->IsDone(); It->Next())
 			{
-				if (!bit_test(*Bitmap, *progress))  //FF FF FF 07 читаются как 11100000 в конце
+				localprogress++ ;
+				if (!bit_test(*Bitmap, localprogress))  //FF FF FF 07 читаются как 11100000 в конце
 				{
 					break;
 				}
 			}
+
 		};
-		virtual bool IsDone() const {return It->IsDone();};
-		virtual void GetCurrentCluster(BYTE *outBuffer) const {It->GetCurrentCluster(outBuffer);};
+//		virtual bool IsDone() const {return It->IsDone();};
+//		virtual void GetCurrent(Type1 *out) const {It->GetCurrent(out);};
+//		virtual void GetCurrentIndex(__int64 *progress){It->GetCurrentIndex(progress);};
 };
 #endif

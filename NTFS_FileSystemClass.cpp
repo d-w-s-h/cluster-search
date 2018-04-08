@@ -7,7 +7,9 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include "intsafe.h"
 using namespace std;
+typedef vector<BYTE> DiskCluster;
 
 #include "Main.h"
 //---------------------------------------------------------------------------
@@ -61,11 +63,11 @@ bool NTFS_FileSystemClass::setBootInfo()
 	return false;
 }
 
-bool NTFS_FileSystemClass::readClusters(ULONGLONG startCluster, DWORD numberOfClusters, BYTE *outBuffer)
+DiskCluster NTFS_FileSystemClass::readClusters(ULONGLONG startCluster, DWORD numberOfClusters, DiskCluster inBuffer)
 {
 	if(FileHandle == 0)
 	{
-		return false;
+		//return NULL;
 	}
 	// Вычисление смещение
 	// Позиционирование
@@ -78,13 +80,14 @@ bool NTFS_FileSystemClass::readClusters(ULONGLONG startCluster, DWORD numberOfCl
 	unsigned long currentPosition = SetFilePointer(this->FileHandle,sectorOffset.LowPart,&sectorOffset.HighPart,FILE_BEGIN);
 	if(currentPosition != sectorOffset.LowPart)
 	{
-		return false;
+		//return NULL;
 	}
-	bool readResult = ReadFile(this->FileHandle,outBuffer,bytesToRead,&bytesRead,NULL);
+	bool readResult = ReadFile(this->FileHandle,&inBuffer[0],bytesToRead,&bytesRead,NULL);
 	if(!readResult || bytesRead != bytesToRead)
 	{
-		return false;
+		//return NULL;
 	}
+	return  inBuffer;
 }
 bool NTFS_FileSystemClass::open(wstring FileSystemPath)
 {

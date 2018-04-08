@@ -4,9 +4,11 @@
 #define NTFS_FileSystemClassH
 #include <windows.h>
 #include <string>
+#include <vector>
 using namespace std;
+typedef vector<BYTE> DiskCluster;
 //---------------------------------------------------------------------------
-#endif
+
 
 #pragma pack(push, 1)
 
@@ -52,9 +54,9 @@ public:
 	bool setBootInfo();
 	DWORD getTotalClusters();
 	DWORD getBytesPerCluster();
-	bool readClusters(ULONGLONG startCluster, DWORD numberOfClusters, BYTE *outBuffer);
+	DiskCluster readClusters(ULONGLONG startCluster, DWORD numberOfClusters, DiskCluster inBuffer);
 	void close();
 } ;
 //---------------------------------------------------------------------------
 
-
+ #endif

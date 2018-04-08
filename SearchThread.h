@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 using namespace std;
+typedef vector<BYTE> DiskCluster;
 //---------------------------------------------------------------------------
 // Критическая секция добавления результатов поиска
 TCriticalSection *BufferAccessCS;
@@ -19,8 +20,8 @@ class SearchThread : public TThread
 private:
 	int ClusterSize;
 	int NodeId;
-	BYTE *OutBufferPtr;
-	BYTE *DataBuffer;
+	DiskCluster *OutBufferPtr;
+	DiskCluster DataBuffer;
 	void CopyData();
 	void SearchData();
 	void __fastcall AddMatch();
@@ -34,7 +35,7 @@ protected:
 	void __fastcall Execute();
     vector<string> Signatures;
 public:
-	__fastcall SearchThread(BYTE *dataBufferPtr, int clusterSize, __int64 *progress , bool CreateSuspended);
+	__fastcall SearchThread(DiskCluster *dataBufferPtr, int clusterSize, __int64 *progress , bool CreateSuspended);
 	void __fastcall SearchThread::GetCheckedBoxes();
 
 	// События, используемые для синхронизации

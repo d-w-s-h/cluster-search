@@ -7,6 +7,7 @@
 #include "Main.h"
 #include <vector>
 using namespace std;
+typedef vector<BYTE> DiskCluster;
 #pragma package(smart_init)
 //---------------------------------------------------------------------------
 
@@ -23,7 +24,7 @@ using namespace std;
 //      }
 //---------------------------------------------------------------------------
 
-__fastcall SearchThread::SearchThread(BYTE *dataBufferPtr, int clusterSize, __int64 *progress, bool CreateSuspended)
+__fastcall SearchThread::SearchThread(DiskCluster *dataBufferPtr, int clusterSize, __int64 *progress, bool CreateSuspended)
 	: TThread(CreateSuspended)
 {
 	FreeOnTerminate = true;
@@ -36,9 +37,9 @@ __fastcall SearchThread::SearchThread(BYTE *dataBufferPtr, int clusterSize, __in
 
 	ClusterSize = clusterSize;
 	OutBufferPtr = dataBufferPtr;
-	DataBuffer = new BYTE[clusterSize];
+//	DataBuffer = new BYTE[clusterSize];
 
-    Signatures.reserve(16);
+	Signatures.reserve(16);
     Signatures[0]= "JFIF";
     Signatures[1]= "Exif";
     Signatures[2]= "PNG";
@@ -75,21 +76,24 @@ void __fastcall SearchThread::Execute()
 	delete BufferCopiedEvent;
 	delete BufferAccessCS;
   // Удалить буфер
-	delete[] DataBuffer;
+//	delete[] DataBuffer;
 	//Synchronize(&CompleteSearch);
-    return;
+	return;
 }
 //---------------------------------------------------------------------------
 void SearchThread::CopyData()
 {
-	memcpy(DataBuffer, OutBufferPtr, ClusterSize);
+//	memcpy(DataBuffer, OutBufferPtr, ClusterSize);
+//	DataBuffer= OutBufferPtr;
+	DataBuffer = *OutBufferPtr;
+
 }
 //---------------------------------------------------------------------------
 void SearchThread::SearchData()
 {
 	// Проведем поиск
-	bool matchFound1 = memcmp(OutBufferPtr+6 , Signatures[0].c_str(), Signatures[0].length());
-	bool matchFound2 = memcmp(OutBufferPtr+6 , Signatures[1].c_str(), Signatures[1].length());
+	bool matchFound1 = memcmp(&DataBuffer[0]+6 , Signatures[0].c_str(), Signatures[0].length());
+	bool matchFound2 = memcmp(&DataBuffer[0]+6 , Signatures[1].c_str(), Signatures[1].length());
 
 	if(!matchFound1 ||!matchFound2 )
 	{
@@ -99,7 +103,7 @@ void SearchThread::SearchData()
 
 	if(this->isChecked[0])
 	{
-		if(!memcmp(OutBufferPtr+1 , Signatures[2].c_str(), Signatures[2].length()))
+		if(!memcmp(&DataBuffer[0]+1 , Signatures[2].c_str(), Signatures[2].length()))
 		{
 			SignatureName = "png";
 			Synchronize(&AddMatch);
@@ -107,7 +111,7 @@ void SearchThread::SearchData()
 	}
 	if(this->isChecked[1])
 	{
-		if(!memcmp(OutBufferPtr , Signatures[3].c_str(), Signatures[3].length()))
+		if(!memcmp(&DataBuffer[0] , Signatures[3].c_str(), Signatures[3].length()))
 		{
 			SignatureName = "bmp";
 			Synchronize(&AddMatch);

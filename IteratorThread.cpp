@@ -9,6 +9,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+typedef vector<BYTE> DiskCluster;
 
 
 #pragma package(smart_init)
@@ -53,34 +54,33 @@ void __fastcall IteratorThread::Execute()
 {
 	// Определить размер кластера
 	int clusterSize = this->NTFS_FileSystem->getBytesPerCluster();
-	dataBuffer = new BYTE[clusterSize];
-	MySearchThread = new SearchThread(dataBuffer,clusterSize, &this->progress, false);
+//	dataBuffer = new BYTE[clusterSize];
+	DiskCluster dataCluster(clusterSize);
 
-	// Перебор кластеров диска
-	Iterator<NTFS_FileSystemClass> *it;
+	MySearchThread = new SearchThread(&dataCluster,clusterSize, &this->progress, false);
 
+	Iterator<DiskCluster> *it;
 	if(MainForm->FreeMemModeCheckBox->Checked)
 	{
-		it = new FreeMemoryModeIteratorDecorator<NTFS_FileSystemClass>( new  ClusterIterator<NTFS_FileSystemClass>(this->NTFS_FileSystem),\
-																		MainForm->BitmapBuffer\
-																		);
+		it = new FreeMemoryModeIteratorDecorator<DiskCluster> (new NTFSClusterIterator<DiskCluster>(this->NTFS_FileSystem),MainForm->BitmapBuffer);
 	}
-	else it = new IteratorDecorator<NTFS_FileSystemClass>(new  ClusterIterator<NTFS_FileSystemClass>(this->NTFS_FileSystem));
+	else it = new IteratorDecorator<DiskCluster> (new NTFSClusterIterator<DiskCluster>(this->NTFS_FileSystem));
 
-	for(it->First(&this->progress);!it->IsDone(); it->Next(&this->progress))
+	for(it->First();!it->IsDone(); it->Next())
 	{
 		Synchronize(&IterationProgress);
 
-        it->GetCurrentCluster(dataBuffer);
+		it->GetCurrent(&dataCluster);
+		progress = it->GetCurrentIndex();
 
-        MySearchThread->BufferReadyEvent->SetEvent();
-        while(MySearchThread->BufferCopiedEvent->WaitFor(WaitDelayMs) != wrSignaled)
+		MySearchThread->BufferReadyEvent->SetEvent();
+		while(MySearchThread->BufferCopiedEvent->WaitFor(WaitDelayMs) != wrSignaled)
 		{
 		}
-        MySearchThread->BufferCopiedEvent->ResetEvent();
+		MySearchThread->BufferCopiedEvent->ResetEvent();
        	if(Terminated) break;
-    }
-    delete it;
+	}
+	delete it;
 
 
 //	for(int i = 1; i < this->NTFS_FileSystem->getTotalClusters(); i++)
@@ -101,12 +101,12 @@ void __fastcall IteratorThread::Execute()
 //		while(MySearchThread->BufferCopiedEvent->WaitFor(WaitDelayMs) != wrSignaled)
 //		{
 //		}
-//        MySearchThread->BufferCopiedEvent->ResetEvent();
-//       	if(Terminated) break;
+//		MySearchThread->BufferCopiedEvent->ResetEvent();
+//		if(Terminated) break;
 //	}
 	// Завершить поиск
 	MySearchThread->Terminate();
-	delete[] dataBuffer;
+//	delete[] dataBuffer;
 	NTFS_FileSystem->close();
 	delete NTFS_FileSystem;
 	Synchronize(&ActivateButtons);
