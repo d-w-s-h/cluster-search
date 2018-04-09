@@ -62,16 +62,16 @@ void __fastcall IteratorThread::Execute()
 	Iterator<DiskCluster> *it;
 	if(MainForm->FreeMemModeCheckBox->Checked)
 	{
-		it = new FreeMemoryModeIteratorDecorator<DiskCluster> (new NTFSClusterIterator<DiskCluster>(this->NTFS_FileSystem),MainForm->BitmapBuffer);
+		it = new FreeMemoryModeIteratorDecorator<DiskCluster> (new NTFSClusterIterator<DiskCluster>(this->NTFS_FileSystem), &progress,MainForm->BitmapBuffer);
 	}
-	else it = new IteratorDecorator<DiskCluster> (new NTFSClusterIterator<DiskCluster>(this->NTFS_FileSystem));
+	else it = new IteratorDecorator<DiskCluster> (new NTFSClusterIterator<DiskCluster>(this->NTFS_FileSystem), &progress);
 
 	for(it->First();!it->IsDone(); it->Next())
 	{
 		Synchronize(&IterationProgress);
 
 		it->GetCurrent(&dataCluster);
-		progress = it->GetCurrentIndex();
+//		progress = it->GetCurrentIndex();
 
 		MySearchThread->BufferReadyEvent->SetEvent();
 		while(MySearchThread->BufferCopiedEvent->WaitFor(WaitDelayMs) != wrSignaled)

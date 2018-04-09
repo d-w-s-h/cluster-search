@@ -15,8 +15,7 @@ template <class Type> class Iterator {
 		virtual void Next() = 0;
         virtual bool IsDone() const = 0;
 		virtual void GetCurrent(Type *out) const =0;
-		virtual __int64 GetCurrentIndex() =0 ;
-
+//		virtual __int64 GetCurrentIndex() = 0;
 };
 //---------------------------------------------------------------------------
 template <class Type> class NTFSClusterIterator : public Iterator<Type>
@@ -35,7 +34,7 @@ template <class Type> class NTFSClusterIterator : public Iterator<Type>
 			this->ClusterSize = filesystem->getBytesPerCluster();
 			this->TotalClusters = filesystem->getTotalClusters();
 			this->CurrentCusterIndex = 1;
-			buffer = new BYTE[this->ClusterSize] ;
+			buffer = new BYTE[this->ClusterSize];
         };
 
 		~NTFSClusterIterator()
@@ -61,9 +60,9 @@ template <class Type> class NTFSClusterIterator : public Iterator<Type>
 //			outCluster->insert(outCluster->begin(), buffer, buffer + this->ClusterSize);   //слишком медленно
 
 		};
-		virtual	__int64 GetCurrentIndex()
-		{
-			return  CurrentCusterIndex ;
-		} ;
+//		virtual	__int64 GetCurrentIndex()
+//		{
+//			return  CurrentCusterIndex ;
+//		} ;
 };
 #endif
