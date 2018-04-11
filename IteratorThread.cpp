@@ -28,13 +28,15 @@ __fastcall IteratorThread::IteratorThread(wstring filePath, bool CreateSuspended
 		delete NTFS_FileSystem;
 		return;
 	}
-	bool isSetBootInfo = NTFS_FileSystem->setBootInfo();
-	if(!isSetBootInfo)
+	string isSetBootInfo ="";
+	isSetBootInfo = NTFS_FileSystem->setBootInfo();
+	if(isSetBootInfo=="")
 	{
 		this->Terminate();	//обработать
 		delete NTFS_FileSystem;
 		return;//обработать
 	}
+	MainForm->FSinfoLabel->Caption = isSetBootInfo.c_str();
 	MainForm->SearchButton->Enabled =false;
 	MainForm->StopButton->Enabled =true;
 	MainForm->CheckPNG->Enabled = false;
@@ -62,9 +64,9 @@ void __fastcall IteratorThread::Execute()
 	Iterator<DiskCluster> *it;
 	if(MainForm->FreeMemModeCheckBox->Checked)
 	{
-		it = new FreeMemoryModeIteratorDecorator<DiskCluster> (new NTFSClusterIterator<DiskCluster>(this->NTFS_FileSystem), &progress,MainForm->BitmapBuffer);
+		it = new FreeMemoryModeIteratorDecorator<DiskCluster> (this->NTFS_FileSystem->GetClusterIterator(), &progress,MainForm->BitmapBuffer);
 	}
-	else it = new IteratorDecorator<DiskCluster> (new NTFSClusterIterator<DiskCluster>(this->NTFS_FileSystem), &progress);
+	else it = new IteratorDecorator<DiskCluster> (this->NTFS_FileSystem->GetClusterIterator(), &progress);
 
 	for(it->First();!it->IsDone(); it->Next())
 	{

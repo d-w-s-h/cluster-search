@@ -2,7 +2,7 @@
 
 #pragma hdrstop
 
-#include "NTFS_FileSystemClass.h"
+#include "FSClass.h"
 #include <windows.h>
 #include <string>
 #include <sstream>
@@ -16,14 +16,14 @@ typedef vector<BYTE> DiskCluster;
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 
-NTFS_FileSystemClass::NTFS_FileSystemClass()
+FSClass::FSClass()
 {
 	FileHandle = 0;
 	TotalClusters=0;
 	ClusterFactor=1;
 	BytesPerCluster=512;
 }
-string NTFS_FileSystemClass::setBootInfo()
+string FSClass::setBootInfo()
 {
 	ULONGLONG startOffset = 0;
 	DWORD bytesToRead = 512;
@@ -42,7 +42,7 @@ string NTFS_FileSystemClass::setBootInfo()
 		return "";
 	}
 
-	this->pBootRecord = (NTFS_BootRecord*)dataBuffer;
+	this->pBootRecord = (BootRecord*)dataBuffer;
 	if (!strcmp(pBootRecord->OEM_ID,"NTFS    "))
 	{
 		this->BytesPerCluster=pBootRecord->dBytesPerSector*pBootRecord->dSectorPerCluster;
@@ -64,7 +64,7 @@ string NTFS_FileSystemClass::setBootInfo()
 	return "";
 }
 
-DiskCluster NTFS_FileSystemClass::readClusters(ULONGLONG startCluster, DWORD numberOfClusters, DiskCluster inBuffer)
+DiskCluster FSClass::readClusters(ULONGLONG startCluster, DWORD numberOfClusters, DiskCluster inBuffer)
 {
 	if(FileHandle == 0)
 	{
@@ -90,7 +90,7 @@ DiskCluster NTFS_FileSystemClass::readClusters(ULONGLONG startCluster, DWORD num
 	}
 	return  inBuffer;
 }
-bool NTFS_FileSystemClass::open(wstring FileSystemPath)
+bool FSClass::open(wstring FileSystemPath)
 {
     this->FileHandle = CreateFileW(
 			FileSystemPath.c_str(), // ָלÿ פאיכא (WCHAR*)
@@ -111,22 +111,18 @@ bool NTFS_FileSystemClass::open(wstring FileSystemPath)
 	return true;
 
 }
-DWORD NTFS_FileSystemClass::getBytesPerCluster()
+DWORD FSClass::getBytesPerCluster()
 {
 	return  BytesPerCluster;
 }
-DWORD NTFS_FileSystemClass::getTotalClusters()
+DWORD FSClass::getTotalClusters()
 {
 	return  TotalClusters;
 }
 
-void NTFS_FileSystemClass::close()
+void FSClass::close()
 {
 	CloseHandle(this->FileHandle);
 
-}
-Iterator<DiskCluster> * NTFS_FileSystemClass::GetClusterIterator()
-{
-	return new NTFSClusterIterator<DiskCluster>(this);
 }
 

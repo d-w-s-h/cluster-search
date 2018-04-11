@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 
-#ifndef NTFS_FileSystemClassH
-#define NTFS_FileSystemClassH
+#ifndef FSClassH
+#define FSClassH
 #include <windows.h>
 #include <string>
 #include <vector>
@@ -35,24 +35,24 @@ typedef struct
 	DWORD ClustersPerIndexes;  //68 44
 	ULONGLONG dSerialNumber;  //72 48
     BYTE dDataCode[432];
-} NTFS_BootRecord;
+} BootRecord;
 //---------------------------------------------------------------------------
 #pragma pack(pop)
 
-class NTFS_FileSystemClass
+class FSClass
 {
 protected:
 	HANDLE FileHandle;
 	DWORD TotalClusters;
 	BYTE ClusterFactor;
 	DWORD BytesPerCluster;
-	NTFS_BootRecord *pBootRecord;
+	BootRecord *pBootRecord;
 	char *DebugInfo;
 
 
 public:
 	Iterator<DiskCluster> * GetClusterIterator();
-	NTFS_FileSystemClass();
+	FSClass();
 	bool open(wstring FileSystemPath);
 	string setBootInfo();
 	DWORD getTotalClusters();
@@ -60,51 +60,6 @@ public:
 	DiskCluster readClusters(ULONGLONG startCluster, DWORD numberOfClusters, DiskCluster inBuffer);
 	void close();
 } ;
-
-template <class Type> class NTFSClusterIterator : public Iterator<Type>
-{
-	private:
-		NTFS_FileSystemClass *Filesystem;
-		int ClusterSize;
-		__int64 TotalClusters;
-		__int64 CurrentCusterIndex;
-
-
-	public:
-		NTFSClusterIterator(NTFS_FileSystemClass *filesystem)
-		{
-			this->Filesystem = filesystem;
-			this->ClusterSize = filesystem->getBytesPerCluster();
-			this->TotalClusters = filesystem->getTotalClusters();
-			this->CurrentCusterIndex = 1;
-
-		};
-
-		~NTFSClusterIterator()
-		{
-			delete this->Filesystem;
-
-		};
-
-		virtual void First()
-		{
-			CurrentCusterIndex = 1;
-		};
-		virtual void Next()
-		{
-			CurrentCusterIndex++;
-		};
-		virtual bool IsDone() const {return (CurrentCusterIndex >= TotalClusters ); }; //-1  не нужно
-
-		virtual void GetCurrent(Type *outCluster) const
-		{
-			*outCluster = this->Filesystem->readClusters(CurrentCusterIndex,1,*outCluster);
-			//outCluster->reserve(this->ClusterSize);
-			//outCluster->insert(outCluster->begin(), buffer, buffer + this->ClusterSize);   //слишком медленно
-
-		};
-
-};
 //---------------------------------------------------------------------------
 
  #endif

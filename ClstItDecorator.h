@@ -40,12 +40,12 @@ template<class Type1> class IteratorDecorator : public Iterator<Type1>
 template<class Type1> class FreeMemoryModeIteratorDecorator : public IteratorDecorator<Type1>
 {
 	protected:
-		NTFSClusterIterator<Type1> *It; //указатель на итератор
+		Iterator<Type1> *It; //указатель на итератор
 		BYTE *Bitmap;
 		__int64 localprogress;
 		__int64 *Progress  ;
 	public:
-		FreeMemoryModeIteratorDecorator(NTFSClusterIterator<Type1> *it,__int64 *progress, BYTE *bitmapBuffer)  	: IteratorDecorator<Type1>(it, progress)
+		FreeMemoryModeIteratorDecorator(Iterator<Type1> *it,__int64 *progress, BYTE *bitmapBuffer)  	: IteratorDecorator<Type1>(it, progress)
 		{
 			this->It=it;
 			this->Bitmap = bitmapBuffer;

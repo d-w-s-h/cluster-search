@@ -129,6 +129,10 @@
             <DependentOn>ClusterIterator.h</DependentOn>
             <BuildOrder>6</BuildOrder>
         </CppCompile>
+        <CppCompile Include="FSClass.cpp">
+            <DependentOn>FSClass.h</DependentOn>
+            <BuildOrder>8</BuildOrder>
+        </CppCompile>
         <CppCompile Include="IteratorThread.cpp">
             <DependentOn>IteratorThread.h</DependentOn>
             <BuildOrder>3</BuildOrder>
