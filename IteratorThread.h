@@ -7,6 +7,7 @@
 //---------------------------------------------------------------------------
 #include "SearchThread.h"
 #include "NTFS_FileSystemClass.h"
+#include "exFAT_FileSystemClass.h"
 #include "FSClass.h"
 #include "ClusterIterator.h"
 #include "ClstItDecorator.h"

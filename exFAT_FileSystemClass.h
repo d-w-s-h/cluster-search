@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 
-#ifndef NTFS_FileSystemClassH
-#define NTFS_FileSystemClassH
+#ifndef exFAT_FileSystemClassH
+#define exFAT_FileSystemClassH
 #include <windows.h>
 #include <string>
 #include <vector>
@@ -17,44 +17,38 @@ typedef vector<BYTE> DiskCluster;
 
 typedef struct
 {
-        //в комментариях к полям указано смещение в 10 и 16 формате
-    BYTE djmp[3];   //0
-	char OEM_ID[8];   //3
-	WORD dBytesPerSector;  //11  b
-	BYTE dSectorPerCluster;  //13  d
-	BYTE dUnusedA[7];  //14  e
-	BYTE dMediaID;  //21  15
-	WORD dUnusedB;  //22 16
-	WORD dSectorPerTrack; //24 18
-	WORD dHeadsCount; // 26 1a
-	BYTE dUnusedC[8];  // 28 1c
-	BYTE dUsualy[4];   //36 24
-	ULONGLONG dTotalSectors;  //40 28
-	INT64 dLCNofMFT;  //48 30
-	INT64 dLCNofMFTMirr;  //56 38
-	DWORD ClusterPerMFT;  //64 40
-	DWORD ClustersPerIndexes;  //68 44
-	ULONGLONG dSerialNumber;  //72 48
-    BYTE dDataCode[432];
-} NTFS_BootRecord;
+
+	BYTE djmp[3];   //
+	char OEM_ID[8];   //
+	BYTE jump[61];   //
+	ULONGLONG dTotalSectors; // 72 0x48
+	BYTE jump2[8];
+	DWORD StartBitmap; //88 0x58
+	DWORD dTotalClusters; // 92 0x5C
+	BYTE jump3[12];
+	BYTE SectorPOW; //108 0x6C
+	BYTE ClusterPOW; //109 0x6D
+
+} exFAT_BootRecord;
 //---------------------------------------------------------------------------
 #pragma pack(pop)
 
-class NTFS_FileSystemClass : public FSClass
+class exFAT_FileSystemClass : public FSClass
 {
 protected:
 	using FSClass::FileHandle;
 	using FSClass::TotalClusters;
 	using FSClass:: ClusterFactor;
 	using FSClass::BytesPerCluster;
-	NTFS_BootRecord *pBootRecord;
+	using FSClass::FirstClusterOffset;
+	exFAT_BootRecord *pBootRecord;
 
 
 
 public:
 	virtual Iterator<DiskCluster> * GetClusterIterator();
 	virtual string setBootInfo();
-	NTFS_FileSystemClass();
+	exFAT_FileSystemClass();
 
 //	bool open(wstring FileSystemPath);
 //	DWORD getTotalClusters();
@@ -63,17 +57,17 @@ public:
 //	void close();
 } ;
 
-template <class Type> class NTFSClusterIterator : public Iterator<Type>
+template <class Type> class exFATClusterIterator : public Iterator<Type>
 {
 	private:
-		NTFS_FileSystemClass *Filesystem;
+		exFAT_FileSystemClass *Filesystem;
 		int ClusterSize;
 		__int64 TotalClusters;
 		__int64 CurrentCusterIndex;
 
 
 	public:
-		NTFSClusterIterator(NTFS_FileSystemClass *filesystem)
+		exFATClusterIterator(exFAT_FileSystemClass *filesystem)
 		{
 			this->Filesystem = filesystem;
 			this->ClusterSize = filesystem->getBytesPerCluster();
@@ -82,7 +76,7 @@ template <class Type> class NTFSClusterIterator : public Iterator<Type>
 
 		};
 
-		~NTFSClusterIterator()
+		~exFATClusterIterator()
 		{
 			delete this->Filesystem;
 
@@ -103,9 +97,7 @@ template <class Type> class NTFSClusterIterator : public Iterator<Type>
 			*outCluster = this->Filesystem->readClusters(CurrentCusterIndex,1,*outCluster);
 			//outCluster->reserve(this->ClusterSize);
 			//outCluster->insert(outCluster->begin(), buffer, buffer + this->ClusterSize);   //слишком медленно
-
 		};
-
 };
 //---------------------------------------------------------------------------
 

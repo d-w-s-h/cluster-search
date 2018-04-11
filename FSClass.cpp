@@ -22,6 +22,7 @@ FSClass::FSClass()
 	TotalClusters=0;
 	ClusterFactor=1;
 	BytesPerCluster=512;
+	FirstClusterOffset=0;
 }
 
 
@@ -34,7 +35,7 @@ DiskCluster FSClass::readClusters(ULONGLONG startCluster, DWORD numberOfClusters
 	// Вычисление смещение
 	// Позиционирование
 	// Чтение
-	ULONGLONG startOffset = startCluster*this->BytesPerCluster;
+	ULONGLONG startOffset = FirstClusterOffset + startCluster*this->BytesPerCluster;
 	DWORD bytesToRead = numberOfClusters*this->BytesPerCluster;
 	DWORD bytesRead;
     LARGE_INTEGER sectorOffset;

@@ -46,6 +46,7 @@ protected:
 	DWORD TotalClusters;
 	BYTE ClusterFactor;
 	DWORD BytesPerCluster;
+	ULONGLONG FirstClusterOffset;
 
 public:
 	virtual Iterator<DiskCluster> * GetClusterIterator() = 0;
