@@ -20,7 +20,7 @@ __fastcall IteratorThread::IteratorThread(wstring filePath, bool CreateSuspended
 {
 	FreeOnTerminate = true;
 	// Открыть файловую систему
-	this->FileSystem = new exFAT_FileSystemClass();
+	this->FileSystem = new FAT_FileSystemClass();
 	bool isOpen = this->FileSystem->open(filePath);
 	if(!isOpen)
 	{

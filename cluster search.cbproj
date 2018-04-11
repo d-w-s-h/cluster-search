@@ -133,6 +133,10 @@
             <DependentOn>exFAT_FileSystemClass.h</DependentOn>
             <BuildOrder>9</BuildOrder>
         </CppCompile>
+        <CppCompile Include="FAT_FileSystemClass.cpp">
+            <DependentOn>FAT_FileSystemClass.h</DependentOn>
+            <BuildOrder>10</BuildOrder>
+        </CppCompile>
         <CppCompile Include="FSClass.cpp">
             <DependentOn>FSClass.h</DependentOn>
             <BuildOrder>8</BuildOrder>

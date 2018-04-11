@@ -51,6 +51,7 @@ protected:
 public:
 	virtual Iterator<DiskCluster> * GetClusterIterator() = 0;
 	virtual string setBootInfo() = 0;
+	static FSClass *Create(wstring FileSystemPath);
 
 	FSClass();
 	bool open(wstring FileSystemPath);

@@ -54,7 +54,7 @@ DiskCluster FSClass::readClusters(ULONGLONG startCluster, DWORD numberOfClusters
 }
 bool FSClass::open(wstring FileSystemPath)
 {
-    this->FileHandle = CreateFileW(
+	this->FileHandle = CreateFileW(
 			FileSystemPath.c_str(), // Имя файла (WCHAR*)
 			GENERIC_READ,	  // Режим доступа
 			FILE_SHARE_READ | FILE_SHARE_WRITE, // Режим совместной работы
@@ -84,5 +84,51 @@ DWORD FSClass::getTotalClusters()
 void FSClass::close()
 {
 	CloseHandle(this->FileHandle);
+}
+
+FSClass *FSClass::Create(wstring FileSystemPath)
+{
+	HANDLE FileHandle = CreateFileW(
+			FileSystemPath.c_str(), // Имя файла (WCHAR*)
+			GENERIC_READ,	  // Режим доступа
+			FILE_SHARE_READ | FILE_SHARE_WRITE, // Режим совместной работы
+			NULL, // Атрибуты безопасности
+			OPEN_EXISTING, // Способ открытия
+			FILE_ATTRIBUTE_NORMAL, // Флаги и атрибуты
+			NULL // Описатель (идентификатор) файла шаблона с правами доступа GENERIC_READ.
+		);
+	if(FileHandle == INVALID_HANDLE_VALUE)
+	{
+		// Обработка ошибки
+		Application->MessageBoxW(L"Не удаётся открыть раздел", L"Ошибка", MB_OK);
+		return FALSE;
+	}
+
+
+	ULONGLONG startOffset = 0;
+	DWORD bytesToRead = 512;
+	DWORD bytesRead;
+	BYTE dataBuffer[512];
+	LARGE_INTEGER sectorOffset;
+	sectorOffset.QuadPart = startOffset;
+	unsigned long currentPosition = SetFilePointer(FileHandle,sectorOffset.LowPart,&sectorOffset.HighPart,FILE_BEGIN);
+	if(currentPosition != sectorOffset.LowPart)
+	{
+		return NULL;
+	}
+	bool readResult = ReadFile(FileHandle,dataBuffer,bytesToRead,&bytesRead,NULL);
+	if(!readResult || bytesRead != bytesToRead)
+	{
+		return NULL;
+	}
+
+	this->pBootRecord = (BootRecord*)dataBuffer;
+
+	if (!strcmp(pBootRecord->OEM_ID,"NTFS    "))
+	{
+
+	}
+
+
 }
 
