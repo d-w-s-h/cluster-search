@@ -23,46 +23,7 @@ FSClass::FSClass()
 	ClusterFactor=1;
 	BytesPerCluster=512;
 }
-string FSClass::setBootInfo()
-{
-	ULONGLONG startOffset = 0;
-	DWORD bytesToRead = 512;
-	DWORD bytesRead;
-	BYTE dataBuffer[512];
-	LARGE_INTEGER sectorOffset;
-	sectorOffset.QuadPart = startOffset;
-	unsigned long currentPosition = SetFilePointer(this->FileHandle,sectorOffset.LowPart,&sectorOffset.HighPart,FILE_BEGIN);
-	if(currentPosition != sectorOffset.LowPart)
-	{
-		return "";
-	}
-	bool readResult = ReadFile(FileHandle,dataBuffer,bytesToRead,&bytesRead,NULL);
-	if(!readResult || bytesRead != bytesToRead)
-	{
-		return "";
-	}
 
-	this->pBootRecord = (BootRecord*)dataBuffer;
-	if (!strcmp(pBootRecord->OEM_ID,"NTFS    "))
-	{
-		this->BytesPerCluster=pBootRecord->dBytesPerSector*pBootRecord->dSectorPerCluster;
-		this->TotalClusters=pBootRecord->dTotalSectors/ pBootRecord->dSectorPerCluster;
-
-        stringstream DebugInfo;
-        DebugInfo << "FileSystem: "<<                 pBootRecord->OEM_ID <<  \
-                     "\nSectorsPerCluster: " <<       int(pBootRecord->dSectorPerCluster) << \
-                     "\nBytesPerSector: " <<          pBootRecord->dBytesPerSector <<  \
-                     "\nBytesPerCluster: " <<         this->BytesPerCluster << \
-                     "\nTotalClusters: " <<           this->TotalClusters << \
-                     "\nTotalSectors: " <<            pBootRecord->dTotalSectors;
-
-		OutputDebugStringA(DebugInfo.str().c_str());
-//		MainForm->FSinfoLabel->Caption = DebugInfo.str().c_str();
-		return DebugInfo.str();
-	}
-
-	return "";
-}
 
 DiskCluster FSClass::readClusters(ULONGLONG startCluster, DWORD numberOfClusters, DiskCluster inBuffer)
 {
@@ -106,7 +67,6 @@ bool FSClass::open(wstring FileSystemPath)
 		// Обработка ошибки
 		Application->MessageBoxW(L"Не удаётся открыть раздел", L"Ошибка", MB_OK);
 		return FALSE;
-
 	}
 	return true;
 
@@ -123,6 +83,5 @@ DWORD FSClass::getTotalClusters()
 void FSClass::close()
 {
 	CloseHandle(this->FileHandle);
-
 }
 

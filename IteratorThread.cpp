@@ -20,20 +20,20 @@ __fastcall IteratorThread::IteratorThread(wstring filePath, bool CreateSuspended
 {
 	FreeOnTerminate = true;
 	// Открыть файловую систему
-	this->NTFS_FileSystem = new NTFS_FileSystemClass();
-	bool isOpen = NTFS_FileSystem->open(filePath);
+	this->FileSystem = new NTFS_FileSystemClass();
+	bool isOpen = this->FileSystem->open(filePath);
 	if(!isOpen)
 	{
 		this->Terminate();	//обработать
-		delete NTFS_FileSystem;
+		delete this->FileSystem;
 		return;
 	}
 	string isSetBootInfo ="";
-	isSetBootInfo = NTFS_FileSystem->setBootInfo();
+	isSetBootInfo = FileSystem->setBootInfo();
 	if(isSetBootInfo=="")
 	{
 		this->Terminate();	//обработать
-		delete NTFS_FileSystem;
+		delete this->FileSystem;
 		return;//обработать
 	}
 	MainForm->FSinfoLabel->Caption = isSetBootInfo.c_str();
@@ -41,7 +41,7 @@ __fastcall IteratorThread::IteratorThread(wstring filePath, bool CreateSuspended
 	MainForm->StopButton->Enabled =true;
 	MainForm->CheckPNG->Enabled = false;
 	MainForm->CheckBMP->Enabled = false;
-	MainForm->ProgressBar->Max = this->NTFS_FileSystem->getTotalClusters();
+	MainForm->ProgressBar->Max = this->FileSystem->getTotalClusters();
 	MainForm->ProgressBar->Visible = true;
 	MainForm->ProgressLabel->Visible = true;
 	MainForm->BitmapButton->Enabled =false;
@@ -55,7 +55,7 @@ __fastcall IteratorThread::IteratorThread(wstring filePath, bool CreateSuspended
 void __fastcall IteratorThread::Execute()
 {
 	// Определить размер кластера
-	int clusterSize = this->NTFS_FileSystem->getBytesPerCluster();
+	int clusterSize = this->FileSystem->getBytesPerCluster();
 //	dataBuffer = new BYTE[clusterSize];
 	DiskCluster dataCluster(clusterSize);
 
@@ -64,9 +64,9 @@ void __fastcall IteratorThread::Execute()
 	Iterator<DiskCluster> *it;
 	if(MainForm->FreeMemModeCheckBox->Checked)
 	{
-		it = new FreeMemoryModeIteratorDecorator<DiskCluster> (this->NTFS_FileSystem->GetClusterIterator(), &progress,MainForm->BitmapBuffer);
+		it = new FreeMemoryModeIteratorDecorator<DiskCluster> (this->FileSystem->GetClusterIterator(), &progress,MainForm->BitmapBuffer);
 	}
-	else it = new IteratorDecorator<DiskCluster> (this->NTFS_FileSystem->GetClusterIterator(), &progress);
+	else it = new IteratorDecorator<DiskCluster> (this->FileSystem->GetClusterIterator(), &progress);
 
 	for(it->First();!it->IsDone(); it->Next())
 	{
@@ -109,8 +109,8 @@ void __fastcall IteratorThread::Execute()
 	// Завершить поиск
 	MySearchThread->Terminate();
 //	delete[] dataBuffer;
-	NTFS_FileSystem->close();
-	delete NTFS_FileSystem;
+	FileSystem->close();
+	delete FileSystem;
 	Synchronize(&ActivateButtons);
     return;
 }
@@ -133,7 +133,7 @@ void __fastcall IteratorThread::IterationProgress()
 {
 	MainForm->ProgressBar->Position = this->progress;
     std::stringstream ProgressStr;
-    ProgressStr << "cluster "<< this->progress << " of "<< this->NTFS_FileSystem->getTotalClusters();
+	ProgressStr << "cluster "<< this->progress << " of "<< this->FileSystem->getTotalClusters();
     MainForm->ProgressLabel->Caption = ProgressStr.str().c_str();
 }
 //---------------------------------------------------------------------------

@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <string>
 #include <vector>
+#include "FSClass.h"
 
 #include "ClusterIterator.h"
 using namespace std;
@@ -39,26 +40,27 @@ typedef struct
 //---------------------------------------------------------------------------
 #pragma pack(pop)
 
-class NTFS_FileSystemClass
+class NTFS_FileSystemClass   : public FSClass
 {
 protected:
-	HANDLE FileHandle;
-	DWORD TotalClusters;
-	BYTE ClusterFactor;
-	DWORD BytesPerCluster;
+	using FSClass::FileHandle;
+	using FSClass::TotalClusters;
+	using FSClass:: ClusterFactor;
+	using FSClass::BytesPerCluster;
 	NTFS_BootRecord *pBootRecord;
-	char *DebugInfo;
+
 
 
 public:
-	Iterator<DiskCluster> * GetClusterIterator();
+	virtual Iterator<DiskCluster> * GetClusterIterator();
+	virtual string setBootInfo();
 	NTFS_FileSystemClass();
-	bool open(wstring FileSystemPath);
-	string setBootInfo();
-	DWORD getTotalClusters();
-	DWORD getBytesPerCluster();
-	DiskCluster readClusters(ULONGLONG startCluster, DWORD numberOfClusters, DiskCluster inBuffer);
-	void close();
+
+//	bool open(wstring FileSystemPath);
+//	DWORD getTotalClusters();
+//	DWORD getBytesPerCluster();
+//	DiskCluster readClusters(ULONGLONG startCluster, DWORD numberOfClusters, DiskCluster inBuffer);
+//	void close();
 } ;
 
 template <class Type> class NTFSClusterIterator : public Iterator<Type>

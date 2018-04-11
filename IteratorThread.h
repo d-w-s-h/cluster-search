@@ -7,13 +7,14 @@
 //---------------------------------------------------------------------------
 #include "SearchThread.h"
 #include "NTFS_FileSystemClass.h"
+#include "FSClass.h"
 #include "ClusterIterator.h"
 #include "ClstItDecorator.h"
 //---------------------------------------------------------------------------
 class IteratorThread : public TThread
 {
 private:
-	NTFS_FileSystemClass *NTFS_FileSystem;
+	FSClass *FileSystem;
 	HANDLE FileSystemHandle;
 	SearchThread *MySearchThread;
 	BYTE *dataBuffer;
