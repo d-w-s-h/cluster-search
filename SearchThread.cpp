@@ -39,7 +39,7 @@ __fastcall SearchThread::SearchThread(DiskCluster *dataBufferPtr, int clusterSiz
 	OutBufferPtr = dataBufferPtr;
 //	DataBuffer = new BYTE[clusterSize];
 
-	Signatures.reserve(16);
+	Signatures.resize(16);
     Signatures[0]= "JFIF";
     Signatures[1]= "Exif";
     Signatures[2]= "PNG";

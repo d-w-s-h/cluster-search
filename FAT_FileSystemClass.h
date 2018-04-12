@@ -22,12 +22,14 @@ typedef struct
 	char OEM_ID[8];   //
 	WORD BytePerSector;   // 11 b
 	BYTE SectorsPerCluster;   // 13 d
-	BYTE jump[5];
+	WORD Reserved;
+    BYTE CountOfFAT;
+	BYTE jump[2];
 	WORD SectorsPerFS16;// 19 0x13
 	BYTE jump2;
 	WORD FAT16size;//22 0x16
 	BYTE jump3[4];
-	DWORD firstClusterOffset;//0x1C
+	DWORD what;//0x1C
 	DWORD SectorsPerFS32;// 32 0x20
 
 } FAT_BootRecord;

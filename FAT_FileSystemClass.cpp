@@ -47,16 +47,19 @@ string FAT_FileSystemClass::setBootInfo()
 	if (!strcmp(pBootRecord->OEM_ID,"MSDOS5.0"))
 	{
 		this->BytesPerCluster=pBootRecord->BytePerSector * pBootRecord->SectorsPerCluster ;
+
+		this->FirstClusterOffset = ((pBootRecord->FAT16size)*(pBootRecord->CountOfFAT)+pBootRecord->Reserved )*pBootRecord->BytePerSector;
+
 		if(this->pBootRecord->SectorsPerFS16 != 0)
 		{
-			this->TotalClusters= pBootRecord->SectorsPerFS16 / pBootRecord->SectorsPerCluster;
+			this->TotalClusters= pBootRecord->SectorsPerFS16 / pBootRecord->SectorsPerCluster - (this->FirstClusterOffset)/this->BytesPerCluster ;
 		}
-		else this->TotalClusters= pBootRecord->SectorsPerFS32 / pBootRecord->SectorsPerCluster;
+		else this->TotalClusters= pBootRecord->SectorsPerFS32 / pBootRecord->SectorsPerCluster - (this->FirstClusterOffset)/this->BytesPerCluster;
 
-		//this->FirstClusterOffset =  pBootRecord->firstClusterOffset;
+
 
 		stringstream DebugInfo;
-		DebugInfo << "FileSystem: "<<                 "FAT"<<  \
+		DebugInfo << "FileSystem: "<<                 "FAT16"<<  \
 					 "\nSectorsPerCluster: " <<       int(pBootRecord->SectorsPerCluster) << \
 					 "\nBytesPerSector: " <<          int(pBootRecord->BytePerSector) <<  \
 					 "\nBytesPerCluster: " <<         this->BytesPerCluster << \

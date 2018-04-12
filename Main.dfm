@@ -4,7 +4,7 @@ object MainForm: TMainForm
   BorderStyle = bsSingle
   Caption = 'ClusterSearch'
   ClientHeight = 450
-  ClientWidth = 291
+  ClientWidth = 288
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -44,7 +44,7 @@ object MainForm: TMainForm
     EditLabel.Height = 13
     EditLabel.Caption = #1055#1091#1090#1100' '#1082' '#1088#1072#1079#1076#1077#1083#1091
     TabOrder = 0
-    Text = '\\.\I:'
+    Text = '\\.\G:'
   end
   object ResultTree: TVirtualStringTree
     Left = 8

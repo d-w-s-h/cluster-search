@@ -20,7 +20,13 @@ __fastcall IteratorThread::IteratorThread(wstring filePath, bool CreateSuspended
 {
 	FreeOnTerminate = true;
 	// Открыть файловую систему
-	this->FileSystem = new FAT_FileSystemClass();
+	this->FileSystem =  FSClass::Create(filePath);
+	if(this->FileSystem==NULL)
+	{
+		this->Terminate();	//обработать
+		delete this->FileSystem;
+		return;
+	}
 	bool isOpen = this->FileSystem->open(filePath);
 	if(!isOpen)
 	{
@@ -46,10 +52,6 @@ __fastcall IteratorThread::IteratorThread(wstring filePath, bool CreateSuspended
 	MainForm->ProgressLabel->Visible = true;
 	MainForm->BitmapButton->Enabled =false;
 	MainForm->FreeMemModeCheckBox->Enabled = false;
-
-
-
-
 }
 //---------------------------------------------------------------------------
 void __fastcall IteratorThread::Execute()

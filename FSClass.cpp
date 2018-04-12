@@ -8,6 +8,9 @@
 #include <sstream>
 #include <iostream>
 #include "intsafe.h"
+#include "NTFS_FileSystemClass.h"
+#include "exFAT_FileSystemClass.h"
+#include "FAT_FileSystemClass.h"
 
 using namespace std;
 typedef vector<BYTE> DiskCluster;
@@ -38,7 +41,7 @@ DiskCluster FSClass::readClusters(ULONGLONG startCluster, DWORD numberOfClusters
 	ULONGLONG startOffset = FirstClusterOffset + startCluster*this->BytesPerCluster;
 	DWORD bytesToRead = numberOfClusters*this->BytesPerCluster;
 	DWORD bytesRead;
-    LARGE_INTEGER sectorOffset;
+	LARGE_INTEGER sectorOffset;
 	sectorOffset.QuadPart = startOffset;
 	unsigned long currentPosition = SetFilePointer(this->FileHandle,sectorOffset.LowPart,&sectorOffset.HighPart,FILE_BEGIN);
 	if(currentPosition != sectorOffset.LowPart)
@@ -67,7 +70,7 @@ bool FSClass::open(wstring FileSystemPath)
 	{
 		// Обработка ошибки
 		Application->MessageBoxW(L"Не удаётся открыть раздел", L"Ошибка", MB_OK);
-		return FALSE;
+		return NULL;
 	}
 	return true;
 
@@ -103,8 +106,6 @@ FSClass *FSClass::Create(wstring FileSystemPath)
 		Application->MessageBoxW(L"Не удаётся открыть раздел", L"Ошибка", MB_OK);
 		return FALSE;
 	}
-
-
 	ULONGLONG startOffset = 0;
 	DWORD bytesToRead = 512;
 	DWORD bytesRead;
@@ -122,13 +123,22 @@ FSClass *FSClass::Create(wstring FileSystemPath)
 		return NULL;
 	}
 
-	this->pBootRecord = (BootRecord*)dataBuffer;
+	BootRecord *pBootRecord = (BootRecord*)dataBuffer;
 
 	if (!strcmp(pBootRecord->OEM_ID,"NTFS    "))
 	{
-
+		return new NTFS_FileSystemClass();
 	}
+	else if (!strcmp(pBootRecord->OEM_ID,"EXFAT   "))
+	{
+		return new exFAT_FileSystemClass();
+	}
+	else if (!strcmp(pBootRecord->OEM_ID,"MSDOS5.0"))
+	{
+		return new FAT_FileSystemClass();
+	}
+	else return NULL;
 
-
+    CloseHandle(FileHandle);
 }
 
