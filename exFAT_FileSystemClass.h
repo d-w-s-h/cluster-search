@@ -38,7 +38,6 @@ class exFAT_FileSystemClass : public FSClass
 protected:
 	using FSClass::FileHandle;
 	using FSClass::TotalClusters;
-	using FSClass:: ClusterFactor;
 	using FSClass::BytesPerCluster;
 	using FSClass::FirstClusterOffset;
 	exFAT_BootRecord *pBootRecord;
@@ -49,12 +48,6 @@ public:
 	virtual Iterator<DiskCluster> * GetClusterIterator();
 	virtual string setBootInfo();
 	exFAT_FileSystemClass();
-
-//	bool open(wstring FileSystemPath);
-//	DWORD getTotalClusters();
-//	DWORD getBytesPerCluster();
-//	DiskCluster readClusters(ULONGLONG startCluster, DWORD numberOfClusters, DiskCluster inBuffer);
-//	void close();
 } ;
 
 template <class Type> class exFATClusterIterator : public Iterator<Type>
@@ -90,13 +83,11 @@ template <class Type> class exFATClusterIterator : public Iterator<Type>
 		{
 			CurrentCusterIndex++;
 		};
-		virtual bool IsDone() const {return (CurrentCusterIndex >= TotalClusters ); }; //-1  не нужно
+		virtual bool IsDone() const {return (CurrentCusterIndex >= TotalClusters ); };
 
 		virtual void GetCurrent(Type *outCluster) const
 		{
 			*outCluster = this->Filesystem->readClusters(CurrentCusterIndex,1,*outCluster);
-			//outCluster->reserve(this->ClusterSize);
-			//outCluster->insert(outCluster->begin(), buffer, buffer + this->ClusterSize);   //слишком медленно
 		};
 };
 //---------------------------------------------------------------------------

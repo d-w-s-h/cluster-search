@@ -29,7 +29,6 @@ class FSClass
 protected:
 	HANDLE FileHandle;
 	DWORD TotalClusters;
-	BYTE ClusterFactor;
 	DWORD BytesPerCluster;
 	ULONGLONG FirstClusterOffset;
 

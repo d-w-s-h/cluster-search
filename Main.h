@@ -46,6 +46,7 @@ __published:	// IDE-managed Components
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall StopButtonClick(TObject *Sender);
 	void __fastcall BitmapButtonClick(TObject *Sender);
+
 private:	// User declarations
 public:		// User declarations
 	__fastcall TMainForm(TComponent* Owner);

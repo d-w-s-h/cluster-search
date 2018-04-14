@@ -19,18 +19,17 @@ __fastcall IteratorThread::IteratorThread(wstring filePath, bool CreateSuspended
 	: TThread(CreateSuspended)
 {
 	FreeOnTerminate = true;
-	// Открыть файловую систему
 	this->FileSystem =  FSClass::Create(filePath);
 	if(this->FileSystem==NULL)
 	{
-		this->Terminate();	//обработать
+		this->Terminate();
 		delete this->FileSystem;
 		return;
 	}
 	bool isOpen = this->FileSystem->open(filePath);
 	if(!isOpen)
 	{
-		this->Terminate();	//обработать
+		this->Terminate();
 		delete this->FileSystem;
 		return;
 	}
@@ -38,9 +37,9 @@ __fastcall IteratorThread::IteratorThread(wstring filePath, bool CreateSuspended
 	isSetBootInfo = FileSystem->setBootInfo();
 	if(isSetBootInfo=="")
 	{
-		this->Terminate();	//обработать
+		this->Terminate();
 		delete this->FileSystem;
-		return;//обработать
+		return;
 	}
 	MainForm->FSinfoLabel->Caption = isSetBootInfo.c_str();
 	MainForm->SearchButton->Enabled =false;
@@ -58,7 +57,6 @@ void __fastcall IteratorThread::Execute()
 {
 	// Определить размер кластера
 	int clusterSize = this->FileSystem->getBytesPerCluster();
-//	dataBuffer = new BYTE[clusterSize];
 	DiskCluster dataCluster(clusterSize);
 
 	MySearchThread = new SearchThread(&dataCluster,clusterSize, &this->progress, false);
@@ -73,44 +71,18 @@ void __fastcall IteratorThread::Execute()
 	for(it->First();!it->IsDone(); it->Next())
 	{
 		Synchronize(&IterationProgress);
-
 		it->GetCurrent(&dataCluster);
-//		progress = it->GetCurrentIndex();
 
 		MySearchThread->BufferReadyEvent->SetEvent();
-		while(MySearchThread->BufferCopiedEvent->WaitFor(WaitDelayMs) != wrSignaled)
-		{
-		}
+		while(MySearchThread->BufferCopiedEvent->WaitFor(WaitDelayMs) != wrSignaled){}
+
 		MySearchThread->BufferCopiedEvent->ResetEvent();
        	if(Terminated) break;
 	}
 	delete it;
 
-
-//	for(int i = 1; i < this->NTFS_FileSystem->getTotalClusters(); i++)
-//	{
-//		this->progress = i;
-//		Synchronize(&IterationProgress);
-//		// Заблокировать доступ к буферу
-//		//BufferAccessCS->Enter();
-//
-//		// Считать данные в локальный буфер
-//		this->NTFS_FileSystem->readClusters(i,1,dataBuffer);
-//		// Разблокировать доступ к буферу
-//		//BufferAccessCS->Leave();
-//
-//		// Выставить флаг готовности буфера
-//		MySearchThread->BufferReadyEvent->SetEvent();
-//		// Ожидать окончания копирования буфера
-//		while(MySearchThread->BufferCopiedEvent->WaitFor(WaitDelayMs) != wrSignaled)
-//		{
-//		}
-//		MySearchThread->BufferCopiedEvent->ResetEvent();
-//		if(Terminated) break;
-//	}
 	// Завершить поиск
 	MySearchThread->Terminate();
-//	delete[] dataBuffer;
 	FileSystem->close();
 	delete FileSystem;
 	Synchronize(&ActivateButtons);

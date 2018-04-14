@@ -25,7 +25,7 @@ void __fastcall TMainForm::SearchButtonClick(TObject *Sender)
 {
 	ResultTree-> Clear();
 	myIteratorThread = new IteratorThread(PathEdit->Text.c_str(), false);
-    isTerminated = false;
+	isTerminated = false;
 }
 //---------------------------------------------------------------------------
 
@@ -105,6 +105,10 @@ void __fastcall TMainForm::BitmapButtonClick(TObject *Sender)
 	}
 }
 //---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+
+
 
 
 

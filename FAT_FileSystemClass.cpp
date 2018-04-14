@@ -20,7 +20,6 @@ FAT_FileSystemClass::FAT_FileSystemClass()
 {
 	FileHandle = 0;
 	TotalClusters=0;
-	ClusterFactor=1;
 	BytesPerCluster=512;
 }
 string FAT_FileSystemClass::setBootInfo()
@@ -46,25 +45,27 @@ string FAT_FileSystemClass::setBootInfo()
 
 	if (!strcmp(pBootRecord->OEM_ID,"MSDOS5.0"))
 	{
-		this->BytesPerCluster=pBootRecord->BytePerSector * pBootRecord->SectorsPerCluster ;
-
-		this->FirstClusterOffset = ((pBootRecord->FAT16size)*(pBootRecord->CountOfFAT)+pBootRecord->Reserved )*pBootRecord->BytePerSector;
-
-		if(this->pBootRecord->SectorsPerFS16 != 0)
-		{
-			this->TotalClusters= pBootRecord->SectorsPerFS16 / pBootRecord->SectorsPerCluster - (this->FirstClusterOffset)/this->BytesPerCluster ;
-		}
-		else this->TotalClusters= pBootRecord->SectorsPerFS32 / pBootRecord->SectorsPerCluster - (this->FirstClusterOffset)/this->BytesPerCluster;
-
-
-
 		stringstream DebugInfo;
-		DebugInfo << "FileSystem: "<<                 "FAT16"<<  \
-					 "\nSectorsPerCluster: " <<       int(pBootRecord->SectorsPerCluster) << \
-					 "\nBytesPerSector: " <<          int(pBootRecord->BytePerSector) <<  \
-					 "\nBytesPerCluster: " <<         this->BytesPerCluster << \
-					 "\nTotalClusters: " <<           this->TotalClusters << \
-					 "\nTotalSectors: " <<            int(TotalClusters * pBootRecord->SectorsPerCluster);
+		if (!memcmp(pBootRecord->FATNAME, "FAT32   ", 5))
+		{
+			this->BytesPerCluster=pBootRecord->BytePerSector * pBootRecord->SectorsPerCluster  ;
+
+			this->FirstClusterOffset = ((pBootRecord->FAT32size)*(pBootRecord->CountOfFAT)\
+			+pBootRecord->Reserved )*pBootRecord->BytePerSector -2*this->BytesPerCluster;  //first cluster #2
+
+			this->TotalClusters= pBootRecord->SectorsPerFS32 / pBootRecord->SectorsPerCluster \
+			- (this->FirstClusterOffset)/this->BytesPerCluster - 2;
+
+			DebugInfo << "FileSystem: "<<                 "FAT32" <<  \
+						 "\nSectorsPerCluster: " <<       int(pBootRecord->SectorsPerCluster) << \
+						 "\nBytesPerSector: " <<          int(pBootRecord->BytePerSector) <<  \
+						 "\nBytesPerCluster: " <<         this->BytesPerCluster << \
+						 "\nTotalClusters: " <<           this->TotalClusters << \
+						 "\nTotalSectors: " <<            int(TotalClusters * pBootRecord->SectorsPerCluster);
+
+		}
+		else return "";
+
 
 		OutputDebugStringA(DebugInfo.str().c_str());
 //		MainForm->FSinfoLabel->Caption = DebugInfo.str().c_str();

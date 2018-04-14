@@ -20,7 +20,6 @@ exFAT_FileSystemClass::exFAT_FileSystemClass()
 {
 	FileHandle = 0;
 	TotalClusters=0;
-	ClusterFactor=1;
 	BytesPerCluster=512;
 }
 string exFAT_FileSystemClass::setBootInfo()

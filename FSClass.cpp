@@ -23,7 +23,6 @@ FSClass::FSClass()
 {
 	FileHandle = 0;
 	TotalClusters=0;
-	ClusterFactor=1;
 	BytesPerCluster=512;
 	FirstClusterOffset=0;
 }
@@ -46,12 +45,12 @@ DiskCluster FSClass::readClusters(ULONGLONG startCluster, DWORD numberOfClusters
 	unsigned long currentPosition = SetFilePointer(this->FileHandle,sectorOffset.LowPart,&sectorOffset.HighPart,FILE_BEGIN);
 	if(currentPosition != sectorOffset.LowPart)
 	{
-		//return NULL;
+		return inBuffer;
 	}
 	bool readResult = ReadFile(this->FileHandle,&inBuffer[0],bytesToRead,&bytesRead,NULL);
 	if(!readResult || bytesRead != bytesToRead)
 	{
-		//return NULL;
+		return inBuffer;
 	}
 	return  inBuffer;
 }
